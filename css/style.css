@@ -1,0 +1,60 @@
+* {
+    background-color: #EDEDED;
+}
+.contHeaderVexo {
+    width: 100vw;
+    height: 13vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.logoVEXO {
+    background-color: white;
+    img {
+        background-color: white;
+        width: 14vw;
+        padding-left: 6vh;
+    }
+}
+
+.contImg {
+    position: absolute;
+    top: 4.9vw;
+    width: 100vw;
+    height: 91vh;
+
+    img {
+        width: 55vw;
+        height: 91vh;
+        position: absolute;
+        left: 45vw;
+    }
+}
+
+.contBottonRegistro {
+    width: 45.6vw;
+    height: 91vh;
+    position: absolute;
+    top: 12.4vh;
+    left: 0;
+}
+
+.sectionButton {
+    width: 30vw;
+    height: 60vh;
+    position: relative;
+    top: 15vh;
+    left: 7.5vw;
+}
+
+.divTexButton {
+    width: 15vw;
+    height: 15vh;
+    position: relative;
+    top: 15vh;
+    left: 15vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
