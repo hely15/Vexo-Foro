@@ -1,12 +1,12 @@
 //Credenciales de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
-    authDomain: "registrocon-97cb2.firebaseapp.com",
-    projectId: "registrocon-97cb2",
-    storageBucket: "registrocon-97cb2.firebasestorage.app",
-    messagingSenderId: "373644979789",
-    appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
-    measurementId: "G-X5Q3RL90PV"
+    apiKey: "AIzaSyCBIgjdichl8zTRn2VysK2ARnZPJpJIq0Q",
+    authDomain: "vexo-a9eff.firebaseapp.com",
+    projectId: "vexo-a9eff",
+    storageBucket: "vexo-a9eff.firebasestorage.app",
+    messagingSenderId: "1016481624740",
+    appId: "1:1016481624740:web:7ccc7ba8a5dfb51ed12c31",
+    measurementId: "G-24G8677F1B"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -21,3 +21,15 @@ function loginWithGoogle() {
 
 //evento de escucha para cuando de click se loguee 
 btnHeaderLogin.addEventListener('click', loginWithGoogle);
+
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
