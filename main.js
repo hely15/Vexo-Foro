@@ -1,8 +1,3 @@
-// Importa solo lo necesario de Firebase (versión modular)
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-
 // Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCBIgjdichl8zTRn2VysK2ARnZPJpJIq0Q",
@@ -14,25 +9,22 @@ const firebaseConfig = {
     measurementId: "G-24G8677F1B"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db = firebase.firestore()
+// Inicializa Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-// Función para iniciar sesión con Google
+// Función para login con Google
 function loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
         .then(result => {
             const user = result.user;
-            console.log("Usuario logueado:", user);
+            console.log("Usuario autenticado:", user);
         })
         .catch(error => {
             console.error("Error al iniciar sesión:", error);
-            alert(error.message);
         });
 }
 
-// Asigna el evento al botón
+// Escuchar click del botón
 document.getElementById('btnHeaderLogin').addEventListener('click', loginWithGoogle);
