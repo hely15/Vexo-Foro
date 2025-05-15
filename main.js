@@ -5,10 +5,10 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 // Configuración de Firebase
 const firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyCBIgjdichl8zTRn2VysK2ARnZPJpJIq0Q",
     authDomain: "vexo-a9eff.firebaseapp.com",
     projectId: "vexo-a9eff",
-    storageBucket: "vexo-a9eff.appspot.com",
+    storageBucket: "vexo-a9eff.firebasestorage.app",
     messagingSenderId: "1016481624740",
     appId: "1:1016481624740:web:7ccc7ba8a5dfb51ed12c31",
     measurementId: "G-24G8677F1B"
