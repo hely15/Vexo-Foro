@@ -39,6 +39,9 @@ const btnSaveProfile = document.getElementById('btnSaveProfile');
 const profileBio = document.getElementById('profileBio');
 const profileInterests = document.getElementById('profileInterests');
 const profileLoader = document.getElementById('profileLoader');
+const profileError = document.getElementById('profileError');
+const profileSuccess = document.getElementById('profileSuccess');
+
 
 
 // ————— Perfil —————
