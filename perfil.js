@@ -79,3 +79,18 @@ btnSaveProfile.addEventListener('click', () => {
             profileLoader.style.display = 'none'; showErrorMessage(profileError, 'Error al guardar');
         });
 });
+
+// ————— Mensajes —————
+function hideMessages() {
+    [postError, postSuccess, profileError, profileSuccess].forEach(el => el.style.display = 'none');
+}
+function showErrorMessage(el, msg) {
+    el.textContent = msg; el.style.display = 'block';
+}
+function showSuccessMessage(el, msg) {
+    el.textContent = msg; el.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    showSection('welcome');
+});
