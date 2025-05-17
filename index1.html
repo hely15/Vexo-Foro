@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Feed de Posts</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <img class="logo" src="Diseño Proyecto Progresivo Pag 1-05.png">
+        <h1 class="site-title">Feed de Posts</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- Feed de Posts -->
+      <section class="section">
+        <div class="tabs">
+          <button id="tabAllPosts" class="tab active">Todos los Posts</button>
+        </div>
+        <div id="postsLoader" class="loader"></div>
+        <div id="postsList" class="post-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ————— Configura con tus credenciales de Firebase —————
+    const firebaseConfig = {
+        apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+        authDomain: "registrocon-97cb2.firebaseapp.com",
+        projectId: "registrocon-97cb2",
+        storageBucket: "registrocon-97cb2.firebasestorage.app",
+        messagingSenderId: "373644979789",
+        appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
+        measurementId: "G-X5Q3RL90PV"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Mapeo de IDs de temas a nombres
+    const topicMap = {
+      '1': 'Infraestructura del Internet',
+      '2': 'Protocolos de Comunicación',
+      '3': 'Funcionamiento de la Web',
+      '4': 'APIs y Servicios Web',
+      '5': 'Seguridad y Buenas Prácticas'
+    };
+
+    // ————— Referencias DOM —————
+    const postsLoader = document.getElementById('postsLoader');
+    const postsList = document.getElementById('postsList');
+
+    // ————— Cargar Posts —————
+    function loadPosts() {
+      postsList.innerHTML = '';
+      postsLoader.style.display = 'block';
+      
+      db.collection('posts')
+        .orderBy('createdAt', 'desc')
+        .get()
+        .then(snap => {
+          postsLoader.style.display = 'none';
+          
+          if (snap.empty) {
+            return postsList.innerHTML = '<p style="text-align:center;color:#666">No hay posts disponibles.</p>';
+          }
+          
+          snap.forEach(doc => {
+            const p = doc.data();
+            const date = p.createdAt?.toDate().toLocaleString() || '';
+            const div = document.createElement('div');
+            div.className = 'post-item';
+            
+            div.innerHTML = `
+              <div class="post-header">
+                <img class="post-author-photo" src="${p.authorPhotoURL || '/placeholder.svg'}" alt="">
+                <span class="post-author-name">${p.authorName || 'Usuario'}</span>
+                <span class="post-date">${date}</span>
+              </div>
+              ${p.topicName ? `<span class="post-topic">${p.topicName}</span>` : ''}
+              <h3 class="post-title">${p.title}</h3>
+              <p class="post-content">${p.content}</p>
+              <a href="post.html?id=${doc.id}" class="btn-view">Ver post completo</a>
+            `;
+            
+            postsList.appendChild(div);
+          });
+        })
+        .catch(e => {
+          postsLoader.style.display = 'none';
+          postsList.innerHTML = '<p style="text-align:center;color:#c62828">Error al cargar los posts.</p>';
+          console.error("Error al cargar posts:", e);
+        });
+    }
+
+    // ————— Inicialización —————
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPosts();
+    });
+  </script>
+</body>
+</html>

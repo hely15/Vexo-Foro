@@ -1,174 +1,240 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ver publicación</title>
-  <link rel="stylesheet" href="css/post.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Post</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <img class="logo" src="Diseño Proyecto Progresivo Pag 1-05.png">
+        <h1 class="site-title">Detalle del Post</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section post-detail">
+        <div id="postLoader" class="loader"></div>
+        <div id="postContent"></div>
+        
+        <div class="comments-section">
+          <h3>Comentarios</h3>
+          <div class="order-container">
+            <label for="orderSelect"><strong>Ordenar por:</strong></label>
+            <select id="orderSelect">
+              <option value="desc">Más recientes</option>
+              <option value="asc">Más antiguos</option>
+            </select>
+          </div>
+          <div id="commentsLoader" class="loader"></div>
+          <div id="commentsList"></div>
+          
+          <div class="comment-form">
+            <textarea id="commentText" placeholder="Escribe un comentario..."></textarea>
+            <button id="btnAddComment">Comentar</button>
+          </div>
+        </div>
+        
+        <a href="index.html" class="btn-back">Volver al feed</a>
+      </section>
+    </div>
+  </main>
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-</head>
-
-<body>
-  <header class="contHeaderVexo">
-    <nav class="logoVEXO">
-      <img src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
-    </nav>
-  </header>
-
-  <div class="container">
-    <div id="post"></div>
-
-    <h3>Comentarios</h3>
-    <div class="order-container">
-      <label for="orderSelect"><strong>Ordenar por:</strong></label>
-      <select id="orderSelect">
-        <option value="desc">Más recientes</option>
-        <option value="asc">Más antiguos</option>
-      </select>
-    </div>
-    <div id="comments"></div>
-
-    <div class="comment-form">
-      <textarea id="new-comment" placeholder="Escribe un comentario..."></textarea>
-      <button onclick="addComment()">Comentar</button>
-      <a href="forum.html" class="back-link">Volver al foro</a>
-    </div>
-
-  </div>
-
   <script>
+    // ————— Configura con tus credenciales de Firebase —————
     const firebaseConfig = {
-      apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
-      authDomain: "registrocon-97cb2.firebaseapp.com",
-      projectId: "registrocon-97cb2",
-      storageBucket: "registrocon-97cb2.appspot.com",
-      messagingSenderId: "373644979789",
-      appId: "1:373644979789:web:5b08ef46eb8852c59fb604"
+        apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+        authDomain: "registrocon-97cb2.firebaseapp.com",
+        projectId: "registrocon-97cb2",
+        storageBucket: "registrocon-97cb2.firebasestorage.app",
+        messagingSenderId: "373644979789",
+        appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
+        measurementId: "G-X5Q3RL90PV"
     };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    const postId = new URLSearchParams(location.search).get("id");
+    // ————— Referencias DOM —————
+    const postLoader = document.getElementById('postLoader');
+    const postContent = document.getElementById('postContent');
+    const commentsLoader = document.getElementById('commentsLoader');
+    const commentsList = document.getElementById('commentsList');
+    const commentText = document.getElementById('commentText');
+    const btnAddComment = document.getElementById('btnAddComment');
+    const orderSelect = document.getElementById('orderSelect');
+
+    // ————— Variables —————
+    const postId = new URLSearchParams(window.location.search).get('id');
     let currentUser = null;
     let unsubscribeComments = null;
 
+    // ————— Autenticación anónima para comentarios —————
+    auth.signInAnonymously().catch(error => {
+      console.error("Error de autenticación anónima:", error);
+    });
+
     auth.onAuthStateChanged(user => {
       currentUser = user;
-      if (postId) {
-        loadPost(postId);
-        listenToComments(postId);
+    });
+
+    // ————— Cargar Post —————
+    function loadPost() {
+      if (!postId) {
+        postContent.innerHTML = '<p class="error-message">ID de post no válido</p>';
+        return;
       }
-    });
 
-    document.getElementById("orderSelect").addEventListener("change", () => {
-      if (postId) listenToComments(postId);
-    });
-
-    function loadPost(id) {
-      db.collection("posts").doc(id).get().then(doc => {
-        if (!doc.exists) return;
-        const p = doc.data();
-        document.getElementById("post").innerHTML = `
-        <div class="comment-header">
-          <img src="${p.authorPhotoURL || 'https://via.placeholder.com/40'}" alt="Foto autor">
-        <div>
-        <strong>${p.authorName}</strong><br>
-        <small>${p.createdAt?.toDate().toLocaleString() || ''}</small>
-        </div>
-        </div>
-        <div class="post-title">${p.title}</div>
-        <div class="post-content">${p.content}</div>
-`;
-
-      });
-    }
-
-    function listenToComments(postId) {
-      const container = document.getElementById("comments");
-      const order = document.getElementById("orderSelect").value;
-
-      if (unsubscribeComments) unsubscribeComments();
-
-      unsubscribeComments = db.collection("posts").doc(postId)
-        .collection("comments")
-        .orderBy("createdAt", order)
-        .onSnapshot(snapshot => {
-          container.innerHTML = "";
-          if (snapshot.empty) {
-            container.innerHTML = "<p>No hay comentarios aún.</p>";
+      postLoader.style.display = 'block';
+      
+      db.collection('posts').doc(postId).get()
+        .then(doc => {
+          postLoader.style.display = 'none';
+          
+          if (!doc.exists) {
+            postContent.innerHTML = '<p class="error-message">El post no existe</p>';
             return;
           }
+          
+          const post = doc.data();
+          const date = post.createdAt?.toDate().toLocaleString() || '';
+          
+          postContent.innerHTML = `
+            <div class="post-header">
+              <img class="post-author-photo" src="${post.authorPhotoURL || '/placeholder.svg'}" alt="">
+              <div class="post-author-info">
+                <span class="post-author-name">${post.authorName || 'Usuario'}</span>
+                <span class="post-date">${date}</span>
+              </div>
+            </div>
+            ${post.topicName ? `<span class="post-topic">${post.topicName}</span>` : ''}
+            <h2 class="post-title">${post.title}</h2>
+            <div class="post-content-full">${post.content}</div>
+          `;
+          
+          loadComments();
+        })
+        .catch(error => {
+          postLoader.style.display = 'none';
+          postContent.innerHTML = '<p class="error-message">Error al cargar el post</p>';
+          console.error("Error al cargar el post:", error);
+        });
+    }
 
+    // ————— Cargar Comentarios —————
+    function loadComments() {
+      if (!postId) return;
+      
+      if (unsubscribeComments) {
+        unsubscribeComments();
+      }
+      
+      commentsLoader.style.display = 'block';
+      commentsList.innerHTML = '';
+      
+      const order = orderSelect.value;
+      
+      unsubscribeComments = db.collection('posts').doc(postId)
+        .collection('comments')
+        .orderBy('createdAt', order)
+        .onSnapshot(snapshot => {
+          commentsLoader.style.display = 'none';
+          commentsList.innerHTML = '';
+          
+          if (snapshot.empty) {
+            commentsList.innerHTML = '<p class="no-comments">No hay comentarios todavía. ¡Sé el primero en comentar!</p>';
+            return;
+          }
+          
           snapshot.forEach(doc => {
-            const c = doc.data();
-            const cid = doc.id;
-            const date = c.createdAt?.toDate().toLocaleString() || '';
-            const div = document.createElement("div");
-            div.className = "comment";
+            const comment = doc.data();
+            const commentId = doc.id;
+            const date = comment.createdAt?.toDate().toLocaleString() || '';
+            
+            const div = document.createElement('div');
+            div.className = 'comment';
             div.innerHTML = `
-              <div class="comment-header" style="border-radius: 50%;">
-                <img src="${c.authorPhotoURL || 'https://via.placeholder.com/40'}" alt="Foto de perfil">
-                <div>
-                  <strong>${c.authorName}</strong><br>
+              <div class="comment-header">
+                <img src="${comment.authorPhotoURL || '/placeholder.svg'}" alt="Foto de perfil">
+                <div class="comment-author-info">
+                  <strong>${comment.authorName || 'Usuario anónimo'}</strong>
                   <small>${date}</small>
                 </div>
               </div>
-              <div class="comment-body" id="text-${cid}">${c.text}</div>
-              ${currentUser && currentUser.uid === c.authorId ? `
-                  <div class="comment-buttons">
-                    <button class="btn-small edit-btn" onclick="editComment('${cid}', \`${c.text.replace(/`/g, '\\`')}\`)">
-                      <img src="storage/img/pencil.svg" alt="Editar">
-                    </button>
-                    <button class="btn-small delete-btn" onclick="deleteComment('${cid}')">
-                      <img src="storage/img/trash.svg" alt="Eliminar">
-                    </button>
-                  </div>
-
-                ` : ''
-              }
+              <div class="comment-body">${comment.text}</div>
             `;
-            container.appendChild(div);
+            
+            commentsList.appendChild(div);
           });
+        }, error => {
+          commentsLoader.style.display = 'none';
+          commentsList.innerHTML = '<p class="error-message">Error al cargar comentarios</p>';
+          console.error("Error al cargar comentarios:", error);
         });
     }
 
+    // ————— Añadir Comentario —————
     function addComment() {
-      const input = document.getElementById("new-comment");
-      const text = input.value.trim();
-      if (!text || !currentUser) return alert("Debes iniciar sesión y escribir un comentario.");
-      db.collection("posts").doc(postId).collection("comments").add({
-        text,
+      const text = commentText.value.trim();
+      
+      if (!text) {
+        alert("Por favor escribe un comentario");
+        return;
+      }
+      
+      if (!currentUser) {
+        alert("Error de autenticación. Recarga la página e intenta de nuevo.");
+        return;
+      }
+      
+      commentsLoader.style.display = 'block';
+      
+      // Usar datos anónimos para el comentario
+      const commentData = {
+        text: text,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorId: currentUser.uid,
-        authorName: currentUser.displayName,
-        authorPhotoURL: currentUser.photoURL || ""
-      }).then(() => {
-        input.value = "";
-      });
-    }
-
-    function editComment(commentId, oldText) {
-      const newText = prompt("Editar comentario:", oldText);
-      if (newText !== null) {
-        db.collection("posts").doc(postId).collection("comments").doc(commentId).update({
-          text: newText,
-          editedAt: firebase.firestore.FieldValue.serverTimestamp()
+        authorName: "Usuario anónimo",
+        authorPhotoURL: ""
+      };
+      
+      db.collection('posts').doc(postId)
+        .collection('comments')
+        .add(commentData)
+        .then(() => {
+          commentText.value = "";
+          commentsLoader.style.display = 'none';
+        })
+        .catch(error => {
+          commentsLoader.style.display = 'none';
+          alert("Error al publicar el comentario. Intenta de nuevo.");
+          console.error("Error al añadir comentario:", error);
         });
-      }
     }
 
-    function deleteComment(commentId) {
-      if (confirm("¿Seguro que deseas eliminar este comentario?")) {
-        db.collection("posts").doc(postId).collection("comments").doc(commentId).delete();
+    // ————— Event Listeners —————
+    document.addEventListener('DOMContentLoaded', loadPost);
+    
+    orderSelect.addEventListener('change', loadComments);
+    
+    btnAddComment.addEventListener('click', addComment);
+    
+    commentText.addEventListener('keypress', event => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        addComment();
       }
-    }
+    });
   </script>
 </body>
-
 </html>
