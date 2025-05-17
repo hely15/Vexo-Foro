@@ -41,6 +41,8 @@ const profileInterests = document.getElementById('profileInterests');
 const profileLoader = document.getElementById('profileLoader');
 const profileError = document.getElementById('profileError');
 const profileSuccess = document.getElementById('profileSuccess');
+const postError = document.getElementById('postError');
+
 
 
 
@@ -107,5 +109,3 @@ function showSuccessMessage(el, msg) {
     el.textContent = msg; el.style.display = 'block';
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-});
