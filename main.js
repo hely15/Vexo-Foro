@@ -18,6 +18,7 @@ function loginWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
         .then(result => {
+            window.location.href = "perfil.html";
             const user = result.user;
 
             const displayName = user.displayName;
