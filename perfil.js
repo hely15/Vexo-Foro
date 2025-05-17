@@ -1,6 +1,6 @@
 
 let currentUser = null;
-let currentTab  = 'all';
+let currentTab = 'all';
 // Firebase ya está inicializado
 const auth = firebase.auth();
 
@@ -22,10 +22,10 @@ auth.onAuthStateChanged(user => {
 const db = firebase.firestore();
 
 
-
-const btnSaveProfile  = document.getElementById('btnSaveProfile');
-const profileBio      = document.getElementById('profileBio');
-const profileInterests= document.getElementById('profileInterests');
+const btnSaveProfile = document.getElementById('btnSaveProfile');
+const profileBio = document.getElementById('profileBio');
+const profileInterests = document.getElementById('profileInterests');
+const profileLoader = document.getElementById('profileLoader');
 
 
 // ————— Perfil —————
