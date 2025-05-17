@@ -12,6 +12,7 @@ const firebaseConfig = {
 // Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 // Función para login con Google
 function loginWithGoogle() {
@@ -38,3 +39,5 @@ function showUserInfo(user) {
     userPhoto.src              = user.photoURL || '';
     userPhotoLarge.src         = user.photoURL || '';
 }
+
+const userName = document.getElementById('userName');
