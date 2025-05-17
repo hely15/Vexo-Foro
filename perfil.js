@@ -16,7 +16,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-firebase.initializeApp(firebaseConfig);
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -108,5 +107,4 @@ function showSuccessMessage(el, msg) {
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-    showSection('welcome');
 });
