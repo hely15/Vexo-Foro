@@ -1,21 +1,26 @@
 // Firebase ya está inicializado
+let currentUser = null;
 
 const auth = firebase.auth();
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        const displayName = user.displayName;
-        const email = user.email;
-        const photoURL = user.photoURL;
+        // Mostrar nombre y foto
+        document.getElementById('userName').textContent = user.displayName;
+        document.getElementById('userPic').src = user.photoURL;
 
-        document.getElementById('userName').textContent = displayName;
-        document.getElementById('userPic').src = photoURL;
+        currentUser = user;
+
+        // Revisar si es nuevo usuario y crear su perfil vacío
+        checkUserInFirestore(user);
+
+        // Cargar perfil si existe
+        loadUserProfile(user.uid);
     } else {
-        // Usuario no autenticado, redirige o muestra un mensaje
         console.log("No hay usuario autenticado.");
-        //window.location.href = "index.html"; // o muestra un aviso
     }
 });
+
 
 const db = firebase.firestore();
 
@@ -29,11 +34,16 @@ function checkUserInFirestore(u) {
                 email: u.email,
                 photoURL: u.photoURL,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                bio: '', interests: []
+                bio: '',
+                interests: []
+            }).then(() => {
+                // Mostrar formulario para que complete su perfil
+                document.getElementById('editProfileForm').style.display = 'block';
             });
         }
     });
 }
+
 function loadUserProfile(uid) {
     profileLoader.style.display = 'block';
     db.collection('users').doc(uid).get()

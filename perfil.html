@@ -27,6 +27,18 @@
             </article>
         </article>
     </section>
+    <article id="editProfileForm" style="display: none; margin-top: 20px;">
+        <h2>Completa tu perfil</h2>
+        <label for="inputBio">Biografía:</label><br>
+        <textarea id="inputBio" rows="3" cols="40" placeholder="Escribe algo sobre ti..."></textarea><br><br>
+        
+        <label for="inputInterests">Intereses (separados por comas):</label><br>
+        <input type="text" id="inputInterests" placeholder="Ej: música, lectura, diseño"><br><br>
+        
+        <button id="btnSaveProfile">Guardar Perfil</button>
+        <p id="profileSuccess" style="color: green; display: none;"></p>
+        <p id="profileError" style="color: red; display: none;"></p>
+    </article>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script>
