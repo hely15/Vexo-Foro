@@ -72,7 +72,7 @@
     background-color: #DBDBDB;
     border-radius: 2vh;
 
-    h1 {
+    .titleInformacion {
     font-size: 4vh;
     top: 2vh;
     position: relative;
@@ -92,4 +92,10 @@
     position: relative;
     left: 82%;
     width: 10%;
+}
+
+.titleIntereses {
+    top: -4vh;
+    position: relative;
+    left: 1vh;
 }
