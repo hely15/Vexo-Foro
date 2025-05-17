@@ -16,7 +16,7 @@ const firebaseConfig = {
   const btnMainLogin = document.getElementById("btnMainLogin")
   const btnLogout = document.getElementById("btnLogout")
   const userInfo = document.getElementById("userInfo")
-  const userName = document.getElementById("userName")
+  const userInfo = document.getElementById("userInfo")
   const userNameBig = document.getElementById("userNameBig")
   const userPhoto = document.getElementById("userPhoto")
   const userPhotoLarge = document.getElementById("userPhotoLarge")
@@ -111,7 +111,7 @@ const firebaseConfig = {
   })
   
   function showUserInfo(user) {
-    userName.textContent = user.displayName
+    userInfo.textContent = user.displayName
     userNameBig.textContent = user.displayName
     userPhoto.src = user.photoURL || ""
     userPhotoLarge.src = user.photoURL || ""
@@ -123,11 +123,11 @@ const firebaseConfig = {
     profileSection.style.display = name === "profile" ? "block" : "none"
     forumSection.style.display = name === "forum" ? "block" : "none"
     navHome.classList.toggle("active", name === "welcome")
-    userName.classList.toggle("active", name === "profile")
+    userInfo.classList.toggle("active", name === "profile")
     navForum.classList.toggle("active", name === "forum")
   }
   navHome.addEventListener("click", () => showSection("welcome"))
-  userName.addEventListener("click", () => (window.location.href = "perfil.html"))
+  userInfo.addEventListener("click", () => (window.location.href = "perfil.html"))
   navForum.addEventListener("click", () => showSection("forum"))
   
   // ————— Perfil —————
