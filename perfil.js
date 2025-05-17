@@ -19,6 +19,7 @@ const db   = firebase.firestore();
 
 auth.onAuthStateChanged(user => {
     if (user) {
+        currentUser = user;
         const displayName = user.displayName;
         const email = user.email;
         const photoURL = user.photoURL;
