@@ -18,7 +18,7 @@ function loginWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
         .then(result => {
-            window.location.href = "perfil.html";
+            window.location.href = "forum.html";
             console.log("Usuario autenticado:", { displayName, email, photoURL });
         })
         .catch(error => {
