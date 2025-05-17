@@ -3,236 +3,233 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ver Post</title>
+  <title>Detalles de la publicación</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <header>
     <div class="container">
       <div class="header-content">
-        <img class="logo" src="Diseño Proyecto Progresivo Pag 1-05.png">
-        <h1 class="site-title">Detalle del Post</h1>
+        <a href="index1.html">
+          <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
+        </a>
       </div>
     </div>
   </header>
 
-  <main>
-    <div class="container">
-      <section class="section post-detail">
-        <div id="postLoader" class="loader"></div>
-        <div id="postContent"></div>
-        
-        <div class="comments-section">
-          <h3>Comentarios</h3>
-          <div class="order-container">
-            <label for="orderSelect"><strong>Ordenar por:</strong></label>
-            <select id="orderSelect">
-              <option value="desc">Más recientes</option>
-              <option value="asc">Más antiguos</option>
-            </select>
-          </div>
-          <div id="commentsLoader" class="loader"></div>
-          <div id="commentsList"></div>
-          
-          <div class="comment-form">
-            <textarea id="commentText" placeholder="Escribe un comentario..."></textarea>
-            <button id="btnAddComment">Comentar</button>
-          </div>
+  <div class="container">
+    <div class="post-detail-container">
+      <div id="post" class="post-detail"></div>
+
+      <h3 class="comments-title">Comentarios</h3>
+      <div class="order-container">
+        <label for="orderSelect"><strong>Ordenar por:</strong></label>
+        <select id="orderSelect">
+          <option value="desc">Más recientes</option>
+          <option value="asc">Más antiguos</option>
+        </select>
+      </div>
+      <div id="comments" class="comments-list"></div>
+
+      <div class="comment-form">
+        <h4>Añadir un comentario</h4>
+        <div class="form-group">
+          <label for="commenterName">Tu nombre (opcional)</label>
+          <input type="text" id="commenterName" class="form-input" placeholder="Anónimo">
         </div>
-        
-        <a href="index.html" class="btn-back">Volver al feed</a>
-      </section>
+        <div class="form-group">
+          <label for="commentText">Comentario</label>
+          <textarea id="commentText" class="form-textarea" placeholder="Escribe tu comentario aquí..."></textarea>
+        </div>
+        <button id="btnAddComment" class="btn-save">Publicar comentario</button>
+        <div id="commentError" class="error-message"></div>
+        <div id="commentSuccess" class="success-message"></div>
+      </div>
+
+      <a href="index.html" class="back-link">← Volver al feed</a>
     </div>
-  </main>
+  </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // ————— Configura con tus credenciales de Firebase —————
     const firebaseConfig = {
-        apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
-        authDomain: "registrocon-97cb2.firebaseapp.com",
-        projectId: "registrocon-97cb2",
-        storageBucket: "registrocon-97cb2.firebasestorage.app",
-        messagingSenderId: "373644979789",
-        appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
-        measurementId: "G-X5Q3RL90PV"
+      apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+      authDomain: "registrocon-97cb2.firebaseapp.com",
+      projectId: "registrocon-97cb2",
+      storageBucket: "registrocon-97cb2.appspot.com",
+      messagingSenderId: "373644979789",
+      appId: "1:373644979789:web:5b08ef46eb8852c59fb604"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ————— Referencias DOM —————
-    const postLoader = document.getElementById('postLoader');
-    const postContent = document.getElementById('postContent');
-    const commentsLoader = document.getElementById('commentsLoader');
-    const commentsList = document.getElementById('commentsList');
-    const commentText = document.getElementById('commentText');
-    const btnAddComment = document.getElementById('btnAddComment');
-    const orderSelect = document.getElementById('orderSelect');
-
-    // ————— Variables —————
-    const postId = new URLSearchParams(window.location.search).get('id');
-    let currentUser = null;
+    const postId = new URLSearchParams(location.search).get("id");
     let unsubscribeComments = null;
+    
+    // Referencias DOM
+    const postElement = document.getElementById("post");
+    const commentsElement = document.getElementById("comments");
+    const orderSelect = document.getElementById("orderSelect");
+    const commenterName = document.getElementById("commenterName");
+    const commentText = document.getElementById("commentText");
+    const btnAddComment = document.getElementById("btnAddComment");
+    const commentError = document.getElementById("commentError");
+    const commentSuccess = document.getElementById("commentSuccess");
 
-    // ————— Autenticación anónima para comentarios —————
-    auth.signInAnonymously().catch(error => {
-      console.error("Error de autenticación anónima:", error);
-    });
-
-    auth.onAuthStateChanged(user => {
-      currentUser = user;
-    });
-
-    // ————— Cargar Post —————
-    function loadPost() {
-      if (!postId) {
-        postContent.innerHTML = '<p class="error-message">ID de post no válido</p>';
+    // Cargar post
+    function loadPost(id) {
+      if (!id) {
+        postElement.innerHTML = '<p class="error-message">No se encontró la publicación</p>';
         return;
       }
 
-      postLoader.style.display = 'block';
-      
-      db.collection('posts').doc(postId).get()
-        .then(doc => {
-          postLoader.style.display = 'none';
-          
-          if (!doc.exists) {
-            postContent.innerHTML = '<p class="error-message">El post no existe</p>';
-            return;
-          }
-          
-          const post = doc.data();
-          const date = post.createdAt?.toDate().toLocaleString() || '';
-          
-          postContent.innerHTML = `
-            <div class="post-header">
-              <img class="post-author-photo" src="${post.authorPhotoURL || '/placeholder.svg'}" alt="">
-              <div class="post-author-info">
-                <span class="post-author-name">${post.authorName || 'Usuario'}</span>
-                <span class="post-date">${date}</span>
-              </div>
+      db.collection("posts").doc(id).get().then(doc => {
+        if (!doc.exists) {
+          postElement.innerHTML = '<p class="error-message">La publicación no existe o fue eliminada</p>';
+          return;
+        }
+        
+        const p = doc.data();
+        document.title = `${p.title || 'Publicación'} - Detalles`;
+        
+        postElement.innerHTML = `
+          <div class="post-header">
+            <img src="${p.authorPhotoURL || '/placeholder.svg?height=60&width=60'}" alt="Foto autor" class="post-author-photo">
+            <div>
+              <strong class="post-author-name">${p.authorName || 'Usuario anónimo'}</strong><br>
+              <small class="post-date">${p.createdAt?.toDate().toLocaleString() || ''}</small>
             </div>
-            ${post.topicName ? `<span class="post-topic">${post.topicName}</span>` : ''}
-            <h2 class="post-title">${post.title}</h2>
-            <div class="post-content-full">${post.content}</div>
-          `;
-          
-          loadComments();
-        })
-        .catch(error => {
-          postLoader.style.display = 'none';
-          postContent.innerHTML = '<p class="error-message">Error al cargar el post</p>';
-          console.error("Error al cargar el post:", error);
-        });
+          </div>
+          ${p.topicName ? `<span class="post-topic">${p.topicName}</span>` : ''}
+          <h2 class="post-title">${p.title || ''}</h2>
+          <div class="post-content-full">${p.content || ''}</div>
+        `;
+      }).catch(error => {
+        console.error("Error al cargar la publicación:", error);
+        postElement.innerHTML = '<p class="error-message">Error al cargar la publicación</p>';
+      });
     }
 
-    // ————— Cargar Comentarios —————
-    function loadComments() {
+    // Escuchar comentarios
+    function listenToComments(postId) {
       if (!postId) return;
-      
-      if (unsubscribeComments) {
-        unsubscribeComments();
-      }
-      
-      commentsLoader.style.display = 'block';
-      commentsList.innerHTML = '';
       
       const order = orderSelect.value;
       
-      unsubscribeComments = db.collection('posts').doc(postId)
-        .collection('comments')
-        .orderBy('createdAt', order)
+      if (unsubscribeComments) unsubscribeComments();
+
+      unsubscribeComments = db.collection("posts").doc(postId)
+        .collection("comments")
+        .orderBy("createdAt", order)
         .onSnapshot(snapshot => {
-          commentsLoader.style.display = 'none';
-          commentsList.innerHTML = '';
+          commentsElement.innerHTML = "";
           
           if (snapshot.empty) {
-            commentsList.innerHTML = '<p class="no-comments">No hay comentarios todavía. ¡Sé el primero en comentar!</p>';
+            commentsElement.innerHTML = '<p class="no-comments">No hay comentarios aún. ¡Sé el primero en comentar!</p>';
             return;
           }
-          
+
           snapshot.forEach(doc => {
-            const comment = doc.data();
-            const commentId = doc.id;
-            const date = comment.createdAt?.toDate().toLocaleString() || '';
+            const c = doc.data();
+            const date = c.createdAt?.toDate().toLocaleString() || '';
+            const div = document.createElement("div");
+            div.className = "comment";
             
-            const div = document.createElement('div');
-            div.className = 'comment';
             div.innerHTML = `
               <div class="comment-header">
-                <img src="${comment.authorPhotoURL || '/placeholder.svg'}" alt="Foto de perfil">
-                <div class="comment-author-info">
-                  <strong>${comment.authorName || 'Usuario anónimo'}</strong>
-                  <small>${date}</small>
+                <img src="${c.authorPhotoURL || '/placeholder.svg?height=40&width=40'}" alt="Foto de perfil" class="comment-author-photo">
+                <div>
+                  <strong class="comment-author-name">${c.authorName || 'Anónimo'}</strong><br>
+                  <small class="comment-date">${date}</small>
                 </div>
               </div>
-              <div class="comment-body">${comment.text}</div>
+              <div class="comment-body">${c.text}</div>
             `;
             
-            commentsList.appendChild(div);
+            commentsElement.appendChild(div);
           });
         }, error => {
-          commentsLoader.style.display = 'none';
-          commentsList.innerHTML = '<p class="error-message">Error al cargar comentarios</p>';
           console.error("Error al cargar comentarios:", error);
+          commentsElement.innerHTML = '<p class="error-message">Error al cargar los comentarios</p>';
         });
     }
 
-    // ————— Añadir Comentario —————
+    // Añadir comentario
     function addComment() {
+      const name = commenterName.value.trim() || 'Anónimo';
       const text = commentText.value.trim();
       
+      hideMessages();
+      
       if (!text) {
-        alert("Por favor escribe un comentario");
+        showErrorMessage("Debes escribir un comentario");
         return;
       }
       
-      if (!currentUser) {
-        alert("Error de autenticación. Recarga la página e intenta de nuevo.");
+      if (!postId) {
+        showErrorMessage("Error: No se pudo identificar la publicación");
         return;
       }
       
-      commentsLoader.style.display = 'block';
+      btnAddComment.disabled = true;
+      btnAddComment.textContent = "Publicando...";
       
-      // Usar datos anónimos para el comentario
-      const commentData = {
-        text: text,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        authorId: currentUser.uid,
-        authorName: "Usuario anónimo",
-        authorPhotoURL: ""
-      };
-      
-      db.collection('posts').doc(postId)
-        .collection('comments')
-        .add(commentData)
-        .then(() => {
-          commentText.value = "";
-          commentsLoader.style.display = 'none';
-        })
-        .catch(error => {
-          commentsLoader.style.display = 'none';
-          alert("Error al publicar el comentario. Intenta de nuevo.");
-          console.error("Error al añadir comentario:", error);
-        });
+      db.collection("posts").doc(postId).collection("comments").add({
+        text,
+        authorName: name,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        commentText.value = "";
+        showSuccessMessage("Comentario publicado correctamente");
+        btnAddComment.disabled = false;
+        btnAddComment.textContent = "Publicar comentario";
+      }).catch(error => {
+        console.error("Error al publicar comentario:", error);
+        showErrorMessage("Error al publicar el comentario. Intenta de nuevo.");
+        btnAddComment.disabled = false;
+        btnAddComment.textContent = "Publicar comentario";
+      });
     }
 
-    // ————— Event Listeners —————
-    document.addEventListener('DOMContentLoaded', loadPost);
+    // Funciones de utilidad para mensajes
+    function hideMessages() {
+      commentError.style.display = 'none';
+      commentSuccess.style.display = 'none';
+    }
     
-    orderSelect.addEventListener('change', loadComments);
+    function showErrorMessage(message) {
+      commentError.textContent = message;
+      commentError.style.display = 'block';
+    }
     
-    btnAddComment.addEventListener('click', addComment);
+    function showSuccessMessage(message) {
+      commentSuccess.textContent = message;
+      commentSuccess.style.display = 'block';
+    }
+
+    // Event listeners
+    orderSelect.addEventListener("change", () => {
+      if (postId) listenToComments(postId);
+    });
     
-    commentText.addEventListener('keypress', event => {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
+    btnAddComment.addEventListener("click", addComment);
+    
+    commentText.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
         addComment();
+      }
+    });
+
+    // Inicialización
+    document.addEventListener("DOMContentLoaded", () => {
+      if (postId) {
+        loadPost(postId);
+        listenToComments(postId);
+      } else {
+        postElement.innerHTML = '<p class="error-message">No se especificó ninguna publicación</p>';
       }
     });
   </script>

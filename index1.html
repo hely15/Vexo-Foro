@@ -3,35 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Feed de Posts</title>
+  <title>Feed de Publicaciones</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
   <header>
     <div class="container">
       <div class="header-content">
-        <img class="logo" src="Diseño Proyecto Progresivo Pag 1-05.png">
-        <h1 class="site-title">Feed de Posts</h1>
+        <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
+        <div class="search-box" id="search-box">
+          <div class="search-input-group">
+            <input id="searchInput" class="search-input" placeholder="Busca en el feed">
+            <button id="btnSearch" class="search-btn">Buscar</button>
+          </div>
+          <div class="search-filters">
+            <button class="filter-chip active" data-topic="all">Todos los temas</button>
+            <button class="filter-chip" data-topic="1">Infraestructura del Internet</button>
+            <button class="filter-chip" data-topic="2">Protocolos de Comunicación</button>
+            <button class="filter-chip" data-topic="3">Funcionamiento de la Web</button>
+            <button class="filter-chip" data-topic="4">APIs y Servicios Web</button>
+            <button class="filter-chip" data-topic="5">Seguridad y Buenas Prácticas</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
-    <div class="container">
-      <!-- Feed de Posts -->
-      <section class="section">
-        <div class="tabs">
-          <button id="tabAllPosts" class="tab active">Todos los Posts</button>
-        </div>
-        <div id="postsLoader" class="loader"></div>
-        <div id="postsList" class="post-list"></div>
-      </section>
-    </div>
+    <section id="forumSection" class="section">
+      <h1 class="feed-title">Feed de Publicaciones</h1>
+      <div id="postsLoader" class="loader"></div>
+      <div id="postsList" class="post-list"></div>
+    </section>
   </main>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
@@ -46,8 +53,17 @@
         measurementId: "G-X5Q3RL90PV"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
+
+    // ————— Referencias DOM —————
+    const postsList = document.getElementById('postsList');
+    const postsLoader = document.getElementById('postsLoader');
+    const searchInput = document.getElementById('searchInput');
+    const btnSearch = document.getElementById('btnSearch');
+    const filterChips = document.querySelectorAll('.filter-chip');
+
+    let currentFilter = 'all';
+    let searchQuery = '';
 
     // Mapeo de IDs de temas a nombres
     const topicMap = {
@@ -58,56 +74,111 @@
       '5': 'Seguridad y Buenas Prácticas'
     };
 
-    // ————— Referencias DOM —————
-    const postsLoader = document.getElementById('postsLoader');
-    const postsList = document.getElementById('postsList');
-
-    // ————— Cargar Posts —————
-    function loadPosts() {
+    // ————— Posts —————
+    function loadPosts(topicFilter, query) {
       postsList.innerHTML = '';
       postsLoader.style.display = 'block';
       
-      db.collection('posts')
-        .orderBy('createdAt', 'desc')
-        .get()
+      let q = db.collection('posts').orderBy('createdAt', 'desc');
+      
+      // Filtrar por tema si es necesario
+      if (topicFilter !== 'all') {
+        q = q.where('topic', '==', topicFilter);
+      }
+      
+      q.get()
         .then(snap => {
           postsLoader.style.display = 'none';
           
           if (snap.empty) {
-            return postsList.innerHTML = '<p style="text-align:center;color:#666">No hay posts disponibles.</p>';
+            return postsList.innerHTML = '<p class="no-posts">No hay publicaciones disponibles.</p>';
           }
           
-          snap.forEach(doc => {
-            const p = doc.data();
+          let posts = [];
+          snap.forEach(d => {
+            posts.push({ id: d.id, ...d.data() });
+          });
+          
+          // Filtrar por búsqueda si hay una consulta
+          if (query) {
+            const queryLower = query.toLowerCase();
+            posts = posts.filter(p => 
+              p.title?.toLowerCase().includes(queryLower) || 
+              p.content?.toLowerCase().includes(queryLower) ||
+              (p.topicName && p.topicName.toLowerCase().includes(queryLower))
+            );
+          }
+          
+          if (posts.length === 0) {
+            return postsList.innerHTML = '<p class="no-posts">No hay resultados para esta búsqueda.</p>';
+          }
+          
+          posts.forEach(p => {
             const date = p.createdAt?.toDate().toLocaleString() || '';
             const div = document.createElement('div');
             div.className = 'post-item';
             
             div.innerHTML = `
               <div class="post-header">
-                <img class="post-author-photo" src="${p.authorPhotoURL || '/placeholder.svg'}" alt="">
-                <span class="post-author-name">${p.authorName || 'Usuario'}</span>
+                <img class="post-author-photo" src="${p.authorPhotoURL || '/placeholder.svg?height=60&width=60'}" alt="">
+                <span class="post-author-name">${p.authorName || 'Usuario anónimo'}</span>
                 <span class="post-date">${date}</span>
               </div>
               ${p.topicName ? `<span class="post-topic">${p.topicName}</span>` : ''}
-              <h3 class="post-title">${p.title}</h3>
-              <p class="post-content">${p.content}</p>
-              <a href="post.html?id=${doc.id}" class="btn-view">Ver post completo</a>
+              <h3 class="post-title">${p.title || ''}</h3>
+              <p class="post-content">${p.content || ''}</p>
             `;
-            
+
+            const btn = document.createElement('a');
+            btn.href = `post.html?id=${p.id}`;
+            btn.textContent = 'Ver detalles y comentarios';
+            btn.className = 'btn-view-post';
+
+            div.appendChild(btn);
             postsList.appendChild(div);
           });
         })
         .catch(e => {
           postsLoader.style.display = 'none';
-          postsList.innerHTML = '<p style="text-align:center;color:#c62828">Error al cargar los posts.</p>';
+          postsList.innerHTML = '<p class="error-message">Error al cargar las publicaciones. Intenta de nuevo más tarde.</p>';
           console.error("Error al cargar posts:", e);
         });
     }
 
+    // Búsqueda y filtros por tema
+    btnSearch.addEventListener('click', () => {
+      searchQuery = searchInput.value.trim();
+      loadPosts(currentFilter, searchQuery);
+    });
+    
+    // Permitir búsqueda al presionar Enter
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchQuery = searchInput.value.trim();
+        loadPosts(currentFilter, searchQuery);
+      }
+    });
+    
+    // Filtros por tema (chips)
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        // Desactivar todos los chips
+        filterChips.forEach(c => c.classList.remove('active'));
+        
+        // Activar el chip seleccionado
+        chip.classList.add('active');
+        
+        // Actualizar filtro actual
+        currentFilter = chip.dataset.topic;
+        
+        // Recargar posts con el nuevo filtro
+        loadPosts(currentFilter, searchQuery);
+      });
+    });
+
     // ————— Inicialización —————
     document.addEventListener('DOMContentLoaded', () => {
-      loadPosts();
+      loadPosts(currentFilter, searchQuery);
     });
   </script>
 </body>
