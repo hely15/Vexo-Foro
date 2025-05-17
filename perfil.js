@@ -1,28 +1,32 @@
-// Firebase ya está inicializado
-let currentUser = null;
 
+let currentUser = null;
+let currentTab  = 'all';
+// Firebase ya está inicializado
 const auth = firebase.auth();
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        // Mostrar nombre y foto
-        document.getElementById('userName').textContent = user.displayName;
-        document.getElementById('userPic').src = user.photoURL;
+        const displayName = user.displayName;
+        const email = user.email;
+        const photoURL = user.photoURL;
 
-        currentUser = user;
-
-        // Revisar si es nuevo usuario y crear su perfil vacío
-        checkUserInFirestore(user);
-
-        // Cargar perfil si existe
-        loadUserProfile(user.uid);
+        document.getElementById('userName').textContent = displayName;
+        document.getElementById('userPic').src = photoURL;
     } else {
+        // Usuario no autenticado, redirige o muestra un mensaje
         console.log("No hay usuario autenticado.");
+        //window.location.href = "index.html"; // o muestra un aviso
     }
 });
 
-
 const db = firebase.firestore();
+
+
+
+const btnSaveProfile  = document.getElementById('btnSaveProfile');
+const profileBio      = document.getElementById('profileBio');
+const profileInterests= document.getElementById('profileInterests');
+
 
 // ————— Perfil —————
 function checkUserInFirestore(u) {
@@ -34,16 +38,11 @@ function checkUserInFirestore(u) {
                 email: u.email,
                 photoURL: u.photoURL,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                bio: '',
-                interests: []
-            }).then(() => {
-                // Mostrar formulario para que complete su perfil
-                document.getElementById('editProfileForm').style.display = 'block';
+                bio: '', location: '', interests: []
             });
         }
     });
 }
-
 function loadUserProfile(uid) {
     profileLoader.style.display = 'block';
     db.collection('users').doc(uid).get()
@@ -54,21 +53,17 @@ function loadUserProfile(uid) {
             profileName.textContent = d.displayName;
             profileEmail.textContent = d.email;
             profileBio.textContent = d.bio || '—';
+            profileLocation.textContent = d.location || '—';
             profileInterests.textContent = d.interests.join(', ') || '—';
-            inputBio.value = d.bio || '';
-            inputInterests.value = d.interests.join(', ') || '';
-            inputLocation.value = d.location || '';
-
-
-            // 👇 Mostrar formulario también si ya hay perfil
-            document.getElementById('editProfileForm').style.display = 'block';
+            inputBio.value = d.bio;
+            inputLocation.value = d.location;
+            inputInterests.value = d.interests.join(', ');
         })
         .catch(e => {
             profileLoader.style.display = 'none';
             showErrorMessage(profileError, 'No se pudo cargar perfil');
         });
 }
-
 btnSaveProfile.addEventListener('click', () => {
     if (!currentUser) return showErrorMessage(profileError, 'Inicia sesión');
     profileLoader.style.display = 'block'; hideMessages();
@@ -84,23 +79,3 @@ btnSaveProfile.addEventListener('click', () => {
             profileLoader.style.display = 'none'; showErrorMessage(profileError, 'Error al guardar');
         });
 });
-
-const profileBio = document.getElementById('profileBio');
-const profileInterests= document.getElementById('profileInterests');
-
-const data = { 
-    bio: inputBio.value, 
-    location: inputLocation.value, 
-    interests: arr, 
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
-};
-
-const profilePhoto = document.getElementById('userPic');
-const profileName = document.getElementById('userName');
-const profileEmail = document.getElementById('profileEmail'); // este no está en el HTML, agrégalo o quítalo
-const inputBio = document.getElementById('inputBio');
-const inputInterests = document.getElementById('inputInterests');
-const inputLocation = document.getElementById('inputLocation');
-const profileSuccess = document.getElementById('profileSuccess');
-const profileError = document.getElementById('profileError');
-const profileLoader = document.getElementById('profileLoader'); // si lo usas, debe existir

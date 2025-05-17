@@ -39,7 +39,7 @@
         top: 30%;
         left: 0;
 
-        img {
+        .fotoPerfil {
             width: 15%;
             border-radius: 100%;
 
@@ -48,8 +48,7 @@
 }
 
 .nombreUsu {
-    width: 35%;
-    width: auto;
+    width: 53%;
     position: relative;
     top: -32%;
     left: 17%;
@@ -61,13 +60,14 @@
     position: relative;
     top: -54%;
     left: 83%;
+    width: 15%;
 }
 
 .infoPerfil {
     position: relative;
     width: 21%;
     left: 78%;
-    height: 60%;
+    height: 100%;
     top: 6%;
     background-color: #DBDBDB;
     border-radius: 2vh;
@@ -83,7 +83,13 @@
         font-size: 2vh;
         padding: 1vh;
         position: relative;
-        top: -8%;
+        top: -4%;
         font-family: arial;
     }
+}
+
+.profile-form {
+    position: relative;
+    left: 82%;
+    width: 10%;
 }

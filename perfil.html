@@ -18,7 +18,7 @@
         <article class="contImgBanerPerfil">
             <img class="imgBanner" src="storage/img/BannerVexoRe.svg" alt="">
             <div>
-                <img id="userPic" src="storage/img/FotoDePerfilEjem.png" alt="">
+                <img id="userPic" class="fotoPerfil" src="storage/img/FotoDePerfilEjem.png" alt="">
                 <h1 id="userName" class="nombreUsu">Nocturna Satánica</h1>
                 <img class="buttonSeguir" src="storage/img/bottonSeguir.png" alt="">
             </div>
@@ -29,22 +29,25 @@
                 <p id="profileInterests">Intereses</p>
             </article>
         </article>
+        <div class="profile-form">
+            <h3 class="welcome-title">Editar Perfil</h3>
+            <div class="form-group">
+              <label class="form-label" for="inputBio">Biografía</label>
+              <textarea id="inputBio" class="form-textarea"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputLocation">Ubicación</label>
+              <input id="inputLocation" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputInterests">Intereses</label>
+              <input id="inputInterests" class="form-input">
+            </div>
+            <button id="btnSaveProfile" class="btn-save">Guardar Cambios</button>
+            <div id="profileLoader" class="loader"></div>
+          </div>
     </section>
-    <article id="editProfileForm" style="display: none; margin-top: 20px;">
-        <h2>Completa tu perfil</h2>
-        <label for="inputBio">Biografía:</label><br>
-        <textarea id="inputBio" rows="3" cols="40" placeholder="Escribe algo sobre ti..."></textarea><br><br>
 
-        <label for="inputInterests">Intereses (separados por comas):</label><br>
-        <input type="text" id="inputInterests" placeholder="Ej: música, lectura, diseño"><br><br>
-
-        <button id="btnSaveProfile">Guardar Perfil</button>
-        <p id="profileSuccess" style="color: green; display: none;"></p>
-        <p id="profileError" style="color: red; display: none;"></p>
-        <label for="inputLocation">Ubicación:</label><br>
-        <input type="text" id="inputLocation" placeholder="Ciudad, país"><br><br>
-
-    </article>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script>
