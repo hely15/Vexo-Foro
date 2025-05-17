@@ -12,7 +12,6 @@ const firebaseConfig = {
 // Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
 
 
 // Función para login con Google
@@ -33,4 +32,3 @@ function loginWithGoogle() {
 document.getElementById('btnHeaderLogin').addEventListener('click', loginWithGoogle);
 
 
-console.log(db);
