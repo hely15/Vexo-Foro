@@ -19,17 +19,6 @@ function loginWithGoogle() {
     auth.signInWithPopup(provider)
         .then(result => {
             window.location.href = "perfil.html";
-            const user = result.user;
-
-            const displayName = user.displayName;
-            const email = user.email;
-            const photoURL = user.photoURL;
-
-
-            document.getElementById('userName').textContent = displayName;
-            document.getElementById('user-email').textContent = email;
-            document.getElementById('userPic').src = photoURL;
-
             console.log("Usuario autenticado:", { displayName, email, photoURL });
         })
         .catch(error => {
