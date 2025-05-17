@@ -78,7 +78,7 @@
         userInfo.style.display      = 'flex';
         btnMainLogin.style.display  = 'none';
         signedInContent.style.display = 'block';
-        navForum.style.display      = 'inline';
+        navForum.style.display      = 'block';
         navProfile.style.display    = 'inline';
         navHome.style.display     ='inline';
         searchBox.style.display   = 'inline';
