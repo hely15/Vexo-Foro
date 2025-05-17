@@ -2,7 +2,22 @@
 let currentUser = null;
 let currentTab = 'all';
 // Firebase ya está inicializado
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+    authDomain: "registrocon-97cb2.firebaseapp.com",
+    projectId: "registrocon-97cb2",
+    storageBucket: "registrocon-97cb2.firebasestorage.app",
+    messagingSenderId: "373644979789",
+    appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
+    measurementId: "G-X5Q3RL90PV"
+};
+
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db   = firebase.firestore();
+
+firebase.initializeApp(firebaseConfig);
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -19,7 +34,6 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-const db = firebase.firestore();
 
 
 const btnSaveProfile = document.getElementById('btnSaveProfile');
