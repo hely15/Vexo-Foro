@@ -14,6 +14,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
 // Función para login con Google
 function loginWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -32,12 +33,4 @@ function loginWithGoogle() {
 document.getElementById('btnHeaderLogin').addEventListener('click', loginWithGoogle);
 
 
-
-function showUserInfo(user) {
-    userName.textContent       = user.displayName;
-    userNameBig.textContent    = user.displayName;
-    userPhoto.src              = user.photoURL || '';
-    userPhotoLarge.src         = user.photoURL || '';
-}
-
-const userName = document.getElementById('userName');
+console.log(db);
