@@ -55,14 +55,20 @@ function loadUserProfile(uid) {
             profileEmail.textContent = d.email;
             profileBio.textContent = d.bio || '—';
             profileInterests.textContent = d.interests.join(', ') || '—';
-            inputBio.value = d.bio;
-            inputInterests.value = d.interests.join(', ');
+            inputBio.value = d.bio || '';
+            inputInterests.value = d.interests.join(', ') || '';
+            inputLocation.value = d.location || '';
+
+
+            // 👇 Mostrar formulario también si ya hay perfil
+            document.getElementById('editProfileForm').style.display = 'block';
         })
         .catch(e => {
             profileLoader.style.display = 'none';
             showErrorMessage(profileError, 'No se pudo cargar perfil');
         });
 }
+
 btnSaveProfile.addEventListener('click', () => {
     if (!currentUser) return showErrorMessage(profileError, 'Inicia sesión');
     profileLoader.style.display = 'block'; hideMessages();
@@ -81,3 +87,20 @@ btnSaveProfile.addEventListener('click', () => {
 
 const profileBio = document.getElementById('profileBio');
 const profileInterests= document.getElementById('profileInterests');
+
+const data = { 
+    bio: inputBio.value, 
+    location: inputLocation.value, 
+    interests: arr, 
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+};
+
+const profilePhoto = document.getElementById('userPic');
+const profileName = document.getElementById('userName');
+const profileEmail = document.getElementById('profileEmail'); // este no está en el HTML, agrégalo o quítalo
+const inputBio = document.getElementById('inputBio');
+const inputInterests = document.getElementById('inputInterests');
+const inputLocation = document.getElementById('inputLocation');
+const profileSuccess = document.getElementById('profileSuccess');
+const profileError = document.getElementById('profileError');
+const profileLoader = document.getElementById('profileLoader'); // si lo usas, debe existir

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProfileVexo</title>
     <link rel="stylesheet" href="css/perfil.css">
 </head>
+
 <body>
     <header class="contHeaderVexo">
         <nav class="logoVEXO">
@@ -22,7 +24,8 @@
             </div>
             <article class="infoPerfil">
                 <h1>Informacion</h1>
-                <p id="profileBio" >Perfil personal, creado para compartir mi manera de ver el mundo dar mi opinion sobre diveros temas t compartir con mis seguidores un poco de lo que es mi vida</p>
+                <p id="profileBio">Perfil personal, creado para compartir mi manera de ver el mundo dar mi opinion sobre
+                    diveros temas t compartir con mis seguidores un poco de lo que es mi vida</p>
                 <p id="profileInterests">Intereses</p>
             </article>
         </article>
@@ -31,28 +34,32 @@
         <h2>Completa tu perfil</h2>
         <label for="inputBio">Biografía:</label><br>
         <textarea id="inputBio" rows="3" cols="40" placeholder="Escribe algo sobre ti..."></textarea><br><br>
-        
+
         <label for="inputInterests">Intereses (separados por comas):</label><br>
         <input type="text" id="inputInterests" placeholder="Ej: música, lectura, diseño"><br><br>
-        
+
         <button id="btnSaveProfile">Guardar Perfil</button>
         <p id="profileSuccess" style="color: green; display: none;"></p>
         <p id="profileError" style="color: red; display: none;"></p>
+        <label for="inputLocation">Ubicación:</label><br>
+        <input type="text" id="inputLocation" placeholder="Ciudad, país"><br><br>
+
     </article>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script>
         const firebaseConfig = {
-          apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
-          authDomain: "registrocon-97cb2.firebaseapp.com",
-          projectId: "registrocon-97cb2",
-          storageBucket: "registrocon-97cb2.firebasestorage.app",
-          messagingSenderId: "373644979789",
-          appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
-          measurementId: "G-X5Q3RL90PV"
+            apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+            authDomain: "registrocon-97cb2.firebaseapp.com",
+            projectId: "registrocon-97cb2",
+            storageBucket: "registrocon-97cb2.firebasestorage.app",
+            messagingSenderId: "373644979789",
+            appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
+            measurementId: "G-X5Q3RL90PV"
         };
         firebase.initializeApp(firebaseConfig);
-      </script>
+    </script>
     <script src="perfil.js"></script>
 </body>
+
 </html>
