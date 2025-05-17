@@ -13,22 +13,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-
 // Función para login con Google
 function loginWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider)
         .then(result => {
             const user = result.user;
-            console.log("Usuario autenticado:", user);
-            window.location.href = "perfil.html";
+
+            const displayName = user.displayName;
+            const email = user.email;
+            const photoURL = user.photoURL;
+
+
+            document.getElementById('userName').textContent = displayName;
+            document.getElementById('user-email').textContent = email;
+            document.getElementById('userPic').src = photoURL;
+
+            console.log("Usuario autenticado:", { displayName, email, photoURL });
         })
         .catch(error => {
             console.error("Error al iniciar sesión:", error);
         });
 }
 
-// Escuchar click del botón
-document.getElementById('btnHeaderLogin').addEventListener('click', loginWithGoogle);
 
+document.getElementById('btnHeaderLogin').addEventListener('click', loginWithGoogle);
 
