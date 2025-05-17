@@ -1,4 +1,3 @@
-
 let currentUser = null;
 let currentTab = 'all';
 // Firebase ya está inicializado
