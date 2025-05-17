@@ -55,3 +55,34 @@
     font-size: 7vh;
     font-family: Arial, Helvetica, sans-serif;
 }
+
+.buttonSeguir {
+    position: relative;
+    top: -54%;
+    left: 83%;
+}
+
+.infoPerfil {
+    position: relative;
+    width: 21%;
+    left: 78%;
+    height: 60%;
+    top: 6%;
+    background-color: #DBDBDB;
+    border-radius: 2vh;
+
+    h1 {
+    font-size: 4vh;
+    top: 2vh;
+    position: relative;
+    left: 1vh;
+    }
+
+    p {
+        font-size: 2vh;
+        padding: 1vh;
+        position: relative;
+        top: -8%;
+        font-family: arial;
+    }
+}
