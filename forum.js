@@ -10,7 +10,7 @@ const firebaseConfig = {
   firebase.initializeApp(firebaseConfig)
   const auth = firebase.auth()
   const db = firebase.firestore()
-  
+
   // ————— Referencias DOM —————
   const btnHeaderLogin = document.getElementById("btnHeaderLogin")
   const btnMainLogin = document.getElementById("btnMainLogin")
