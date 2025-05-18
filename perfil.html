@@ -50,6 +50,22 @@
             <div id="profileSuccess" style="display: none;"></div>
             <div id="postError" class="error-message">Hubo un error al publicar</div>
         </div>
+        
+        <!-- Sección de Mis Publicaciones -->
+        <div class="my-posts-section">
+            <h2 class="section-title">Mis Publicaciones</h2>
+            <div class="search-filters">
+                <button class="filter-chip active" data-topic="all">Todos los temas</button>
+                <button class="filter-chip" data-topic="1">Infraestructura del Internet</button>
+                <button class="filter-chip" data-topic="2">Protocolos de Comunicación</button>
+                <button class="filter-chip" data-topic="3">Funcionamiento de la Web</button>
+                <button class="filter-chip" data-topic="4">APIs y Servicios Web</button>
+                <button class="filter-chip" data-topic="5">Seguridad y Buenas Prácticas</button>
+            </div>
+            <div id="postsLoader" class="loader"></div>
+            <div id="postsList" class="post-list"></div>
+            <div id="noPostsMessage" class="no-posts-message">No has publicado nada todavía.</div>
+        </div>
     </section>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
