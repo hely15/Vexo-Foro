@@ -14,7 +14,7 @@
         <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
         <div class="search-box" id="search-box">
           <div class="search-input-group">
-            <input id="searchInput" class="search-input" placeholder="Busca en el feed">
+            <input id="searchInput" class="search-input" placeholder="Buscar...">
             <button id="btnSearch" class="search-btn"><i class="fas fa-search"></i></button>
           </div>
           <div class="search-filters" id="searchFilters">
@@ -40,52 +40,78 @@
     </div>
   </header>
 
-  <main>
-    <section id="forumSection" class="section">
-      <!-- Formulario para crear publicación -->
-      <div id="createPostBox" class="create-post-box">
-        <h3 class="create-post-title">Crear publicación</h3>
-        <div class="form-group">
-          <input id="postTitle" class="form-input" placeholder="Título">
-        </div>
-        <div class="form-group">
-          <select id="postTopic" class="form-select" required>
-            <option value="">Selecciona un tema</option>
-            <option value="1">Infraestructura del Internet</option>
-            <option value="2">Protocolos de Comunicación</option>
-            <option value="3">Funcionamiento de la Web</option>
-            <option value="4">APIs y Servicios Web</option>
-            <option value="5">Seguridad y Buenas Prácticas</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <textarea id="postContent" class="form-textarea" placeholder="Escribe aquí tu contenido..."></textarea>
-        </div>
-        <div id="postError" class="error-message"></div>
-        <div id="postSuccess" class="success-message"></div>
-        <button id="btnCreatePost" class="btn-save">Publicar</button>
+  <div class="main-container">
+    <!-- Menú lateral -->
+    <aside class="sidebar">
+      <div class="sidebar-menu">
+        <a href="feed.html" class="sidebar-item active">
+          <i class="fas fa-home"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <i class="fas fa-users"></i>
+          <span>Comunidades</span>
+        </a>
+        <a href="#" class="sidebar-item" id="toggleDarkMode">
+          <i class="fas fa-moon"></i>
+          <span>Modo noche</span>
+        </a>
       </div>
+      
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-item">
+          <span>Reglas de vexo</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <span>Política de privacidad</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <span>Acuerdo del usuario</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <span>Al publicar en vexo</span>
+        </a>
+      </div>
+    </aside>
 
-      <h1 class="feed-title">Feed de Publicaciones</h1>
-      <div id="postsLoader" class="loader"></div>
-      <div id="postsList" class="post-list"></div>
-    </section>
+    <!-- Contenido principal -->
+    <main>
+      <section id="forumSection" class="section">
+        <!-- Formulario para crear publicación -->
+        <div id="createPostBox" class="create-post-box">
+          <h3 class="create-post-title">Crear publicación</h3>
+          <div class="form-group">
+            <input id="postTitle" class="form-input" placeholder="Título">
+          </div>
+          <div class="form-group">
+            <select id="postTopic" class="form-select" required>
+              <option value="">Selecciona un tema</option>
+              <option value="1">Infraestructura del Internet</option>
+              <option value="2">Protocolos de Comunicación</option>
+              <option value="3">Funcionamiento de la Web</option>
+              <option value="4">APIs y Servicios Web</option>
+              <option value="5">Seguridad y Buenas Prácticas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <textarea id="postContent" class="form-textarea" placeholder="Escribe aquí tu contenido..."></textarea>
+          </div>
+          <div id="postError" class="error-message"></div>
+          <div id="postSuccess" class="success-message"></div>
+          <button id="btnCreatePost" class="btn-save">Publicar</button>
+        </div>
 
-  </main>
-  <section class="contMenu">
-    <div class="menu">
-      <a href="feed.html">Inicio</a>
-      <a href="perfil.html">Mi Perfil</a>
-      <a href="">Modo Oscuro</a>
-      <a href="index.html">Cerrar Sesión</a>
-    </div>
-    <div class="menuTerminos">
-      <a href="#">Reglas de Vexo</a>
-      <a href="#">Politica de Privacidad </a>
-      <a href="#">Acuerdo del Usuario</a>
-      <a href="#">Al publicar en Vexo</a>
-    </div>
-  </section>
+        <h1 class="feed-title">Feed de Publicaciones</h1>
+        <div id="postsLoader" class="loader"></div>
+        <div id="postsList" class="post-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Botón para mostrar/ocultar menú en móvil -->
+  <button id="toggleSidebar" class="toggle-sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -126,10 +152,14 @@
     const btnCreatePost = document.getElementById('btnCreatePost');
     const postError = document.getElementById('postError');
     const postSuccess = document.getElementById('postSuccess');
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    const toggleDarkMode = document.getElementById('toggleDarkMode');
 
     let currentUser = null;
     let currentFilter = 'all';
     let searchQuery = '';
+    let darkMode = false;
 
     // Mapeo de IDs de temas a nombres
     const topicMap = {
@@ -183,6 +213,20 @@
       if (!e.target.closest('#search-box')) {
         searchFilters.classList.remove('show');
       }
+    });
+
+    // Mostrar/ocultar sidebar en celuco
+    toggleSidebar.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+      toggleSidebar.classList.toggle('active');
+    });
+
+    // Modo oscuro
+    toggleDarkMode.addEventListener('click', () => {
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode', darkMode);
+      toggleDarkMode.querySelector('i').classList.toggle('fa-moon', !darkMode);
+      toggleDarkMode.querySelector('i').classList.toggle('fa-sun', darkMode);
     });
 
     // ————— Crear publicación —————
