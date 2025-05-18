@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalles de la publicación</title>
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/post.css">
 </head>
 <body>
   <header>
@@ -17,37 +17,25 @@
     </div>
   </header>
 
-  <div class="container">
-    <div class="post-detail-container">
-      <div id="post" class="post-detail"></div>
+    <div class="container">
+    <div id="post"></div>
 
-      <h3 class="comments-title">Comentarios</h3>
-      <div class="order-container">
-        <label for="orderSelect"><strong>Ordenar por:</strong></label>
-        <select id="orderSelect">
-          <option value="desc">Más recientes</option>
-          <option value="asc">Más antiguos</option>
-        </select>
-      </div>
-      <div id="comments" class="comments-list"></div>
-
-      <div class="comment-form">
-        <h4>Añadir un comentario</h4>
-        <div class="form-group">
-          <label for="commenterName">Tu nombre (opcional)</label>
-          <input type="text" id="commenterName" class="form-input" placeholder="Anónimo">
-        </div>
-        <div class="form-group">
-          <label for="commentText">Comentario</label>
-          <textarea id="commentText" class="form-textarea" placeholder="Escribe tu comentario aquí..."></textarea>
-        </div>
-        <button id="btnAddComment" class="btn-save">Publicar comentario</button>
-        <div id="commentError" class="error-message"></div>
-        <div id="commentSuccess" class="success-message"></div>
-      </div>
-
-      <a href="index.html" class="back-link">← Volver al feed</a>
+    <h3>Comentarios</h3>
+    <div class="order-container">
+      <label for="orderSelect"><strong>Ordenar por:</strong></label>
+      <select id="orderSelect">
+        <option value="desc">Más recientes</option>
+        <option value="asc">Más antiguos</option>
+      </select>
     </div>
+    <div id="comments"></div>
+
+    <div class="comment-form">
+      <textarea id="new-comment" placeholder="Escribe un comentario..."></textarea>
+      <button onclick="addComment()">Comentar</button>
+      <a href="index.html" class="back-link">Volver al foro</a>
+    </div>
+
   </div>
 
   <!-- Firebase SDKs -->
