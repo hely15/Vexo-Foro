@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Feed de Publicaciones</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
+        <div class="search-box" id="search-box">
+          <div class="search-input-group">
+            <input id="searchInput" class="search-input" placeholder="Busca en el feed">
+            <button id="btnSearch" class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="search-filters" id="searchFilters">
+            <button class="filter-chip active" data-topic="all">Todos los temas</button>
+            <button class="filter-chip" data-topic="1">Infraestructura del Internet</button>
+            <button class="filter-chip" data-topic="2">Protocolos de Comunicación</button>
+            <button class="filter-chip" data-topic="3">Funcionamiento de la Web</button>
+            <button class="filter-chip" data-topic="4">APIs y Servicios Web</button>
+            <button class="filter-chip" data-topic="5">Seguridad y Buenas Prácticas</button>
+          </div>
+        </div>
+        <div class="user-section" id="userSection">
+          <a href="perfil.html" class="user-profile" id="userProfile">
+            <img id="userPhoto" src="/placeholder.svg?height=40&width=40" alt="Perfil">
+            <span id="userDisplayName">Usuario</span>
+          </a>
+          <button id="btnLogout" class="btn-logout">Cerrar sesión</button>
+        </div>
+        <div class="login-section" id="loginSection">
+          <a href="login.html" class="btn-login">Iniciar sesión</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="forumSection" class="section">
+      <!-- Formulario para crear publicación -->
+      <div id="createPostBox" class="create-post-box">
+        <h3 class="create-post-title">Crear publicación</h3>
+        <div class="form-group">
+          <input id="postTitle" class="form-input" placeholder="Título">
+        </div>
+        <div class="form-group">
+          <select id="postTopic" class="form-select" required>
+            <option value="">Selecciona un tema</option>
+            <option value="1">Infraestructura del Internet</option>
+            <option value="2">Protocolos de Comunicación</option>
+            <option value="3">Funcionamiento de la Web</option>
+            <option value="4">APIs y Servicios Web</option>
+            <option value="5">Seguridad y Buenas Prácticas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea id="postContent" class="form-textarea" placeholder="Escribe aquí tu contenido..."></textarea>
+        </div>
+        <div id="postError" class="error-message"></div>
+        <div id="postSuccess" class="success-message"></div>
+        <button id="btnCreatePost" class="btn-save">Publicar</button>
+      </div>
+
+      <h1 class="feed-title">Feed de Publicaciones</h1>
+      <div id="postsLoader" class="loader"></div>
+      <div id="postsList" class="post-list"></div>
+    </section>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    // ————— Configura con tus credenciales de Firebase —————
+    const firebaseConfig = {
+        apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
+        authDomain: "registrocon-97cb2.firebaseapp.com",
+        projectId: "registrocon-97cb2",
+        storageBucket: "registrocon-97cb2.firebasestorage.app",
+        messagingSenderId: "373644979789",
+        appId: "1:373644979789:web:5b08ef46eb8852c59fb604",
+        measurementId: "G-X5Q3RL90PV"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ————— Referencias DOM —————
+    const postsList = document.getElementById('postsList');
+    const postsLoader = document.getElementById('postsLoader');
+    const searchInput = document.getElementById('searchInput');
+    const searchFilters = document.getElementById('searchFilters');
+    const btnSearch = document.getElementById('btnSearch');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const userSection = document.getElementById('userSection');
+    const loginSection = document.getElementById('loginSection');
+    const userPhoto = document.getElementById('userPhoto');
+    const userDisplayName = document.getElementById('userDisplayName');
+    const btnLogout = document.getElementById('btnLogout');
+    const createPostBox = document.getElementById('createPostBox');
+    const postTitle = document.getElementById('postTitle');
+    const postContent = document.getElementById('postContent');
+    const postTopic = document.getElementById('postTopic');
+    const btnCreatePost = document.getElementById('btnCreatePost');
+    const postError = document.getElementById('postError');
+    const postSuccess = document.getElementById('postSuccess');
+
+    let currentUser = null;
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    // Mapeo de IDs de temas a nombres
+    const topicMap = {
+      '1': 'Infraestructura del Internet',
+      '2': 'Protocolos de Comunicación',
+      '3': 'Funcionamiento de la Web',
+      '4': 'APIs y Servicios Web',
+      '5': 'Seguridad y Buenas Prácticas'
+    };
+
+    // Verificar estado de autenticación
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      
+      if (user) {
+        // Usuario autenticado
+        userSection.style.display = 'flex';
+        loginSection.style.display = 'none';
+        createPostBox.style.display = 'block';
+        
+        // Actualizar información del usuario
+        userPhoto.src = user.photoURL || '/placeholder.svg?height=40&width=40';
+        userDisplayName.textContent = user.displayName || 'Usuario';
+      } else {
+        // Usuario no autenticado
+        userSection.style.display = 'none';
+        loginSection.style.display = 'flex';
+        createPostBox.style.display = 'none';
+      }
+      
+      // Cargar posts independientemente del estado de autenticación
+      loadPosts(currentFilter, searchQuery);
+    });
+
+    // Cerrar sesión
+    btnLogout.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      }).catch(error => {
+        console.error('Error al cerrar sesión:', error);
+      });
+    });
+
+    // Mostrar/ocultar filtros al hacer clic en la barra de búsqueda
+    searchInput.addEventListener('focus', () => {
+      searchFilters.classList.add('show');
+    });
+
+    // Opcional: ocultar filtros al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#search-box')) {
+        searchFilters.classList.remove('show');
+      }
+    });
+
+    // ————— Crear publicación —————
+    btnCreatePost.addEventListener('click', () => {
+      if (!currentUser) {
+        showErrorMessage(postError, "Debes iniciar sesión");
+        return;
+      }
+      
+      const title = postTitle.value.trim();
+      const content = postContent.value.trim();
+      const topic = postTopic.value.trim();
+      
+      if (!title) {
+        showErrorMessage(postError, "Título obligatorio");
+        return;
+      }
+      if (!content) {
+        showErrorMessage(postError, "Contenido obligatorio");
+        return;
+      }
+      if (!topic) {
+        showErrorMessage(postError, "Debes seleccionar un tema");
+        return;
+      }
+      
+      postsLoader.style.display = 'block';
+      hideMessages();
+
+      db.collection('users').doc(currentUser.uid).get()
+        .then(doc => {
+          // Si no existe, usamos los datos de currentUser
+          const u = doc.exists ? doc.data() : {};
+          const authorName = u.displayName || currentUser.displayName || 'Usuario anónimo';
+          const authorPhotoURL = u.photoURL || currentUser.photoURL || '';
+
+          const newPost = {
+            title,
+            content,
+            topic,
+            topicName: topicMap[topic],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            authorId: currentUser.uid,
+            authorName,
+            authorPhotoURL
+          };
+
+          return db.collection('posts').add(newPost);
+        })
+        .then(() => {
+          postsLoader.style.display = 'none';
+          showSuccessMessage(postSuccess, "Publicado correctamente");
+          postTitle.value = "";
+          postContent.value = "";
+          postTopic.value = "";
+          loadPosts(currentFilter, searchQuery);
+        })
+        .catch(error => {
+          postsLoader.style.display = 'none';
+          console.error("Error al crear publicación:", error);
+          showErrorMessage(postError, "Error al publicar. Inténtalo de nuevo.");
+        });
+    });
+
+    // ————— Cargar Posts —————
+    function loadPosts(topicFilter, query) {
+      postsList.innerHTML = '';
+      postsLoader.style.display = 'block';
+      
+      let q = db.collection('posts').orderBy('createdAt', 'desc');
+      
+      // Filtrar por tema si es necesario
+      if (topicFilter !== 'all') {
+        q = q.where('topic', '==', topicFilter);
+      }
+      
+      q.get()
+        .then(snap => {
+          postsLoader.style.display = 'none';
+          
+          if (snap.empty) {
+            return postsList.innerHTML = '<p class="no-posts">No hay publicaciones disponibles.</p>';
+          }
+          
+          let posts = [];
+          snap.forEach(d => {
+            posts.push({ id: d.id, ...d.data() });
+          });
+          
+          // Filtrar por búsqueda si hay una consulta
+          if (query) {
+            const queryLower = query.toLowerCase();
+            posts = posts.filter(p => 
+              p.title?.toLowerCase().includes(queryLower) || 
+              p.content?.toLowerCase().includes(queryLower) ||
+              (p.topicName && p.topicName.toLowerCase().includes(queryLower))
+            );
+          }
+          
+          if (posts.length === 0) {
+            return postsList.innerHTML = '<p class="no-posts">No hay resultados para esta búsqueda.</p>';
+          }
+          
+          posts.forEach(p => {
+            const date = p.createdAt?.toDate().toLocaleString() || '';
+            const div = document.createElement('div');
+            div.className = 'post-item';
+            
+            div.innerHTML = `
+              <div class="post-header">
+                <img class="post-author-photo" src="${p.authorPhotoURL || '/placeholder.svg?height=60&width=60'}" alt="">
+                <span class="post-author-name">${p.authorName || 'Usuario anónimo'}</span>
+                <span class="post-date">${date}</span>
+              </div>
+              ${p.topicName ? `<span class="post-topic">${p.topicName}</span>` : ''}
+              <h3 class="post-title">${p.title || ''}</h3>
+              <p class="post-content">${p.content || ''}</p>
+            `;
+
+            const btn = document.createElement('a');
+            btn.href = `post.html?id=${p.id}`;
+            btn.textContent = 'Ver detalles y comentarios';
+            btn.className = 'btn-view-post';
+
+            div.appendChild(btn);
+            postsList.appendChild(div);
+          });
+        })
+        .catch(e => {
+          postsLoader.style.display = 'none';
+          postsList.innerHTML = '<p class="error-message">Error al cargar las publicaciones. Intenta de nuevo más tarde.</p>';
+          console.error("Error al cargar posts:", e);
+        });
+    }
+
+    // Búsqueda y filtros por tema
+    btnSearch.addEventListener('click', () => {
+      searchQuery = searchInput.value.trim();
+      loadPosts(currentFilter, searchQuery);
+    });
+    
+    // Permitir búsqueda al presionar Enter
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchQuery = searchInput.value.trim();
+        loadPosts(currentFilter, searchQuery);
+      }
+    });
+    
+    // Filtros por tema (chips)
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        // Desactivar todos los chips
+        filterChips.forEach(c => c.classList.remove('active'));
+        
+        // Activar el chip seleccionado
+        chip.classList.add('active');
+        
+        // Actualizar filtro actual
+        currentFilter = chip.dataset.topic;
+        
+        // Recargar posts con el nuevo filtro
+        loadPosts(currentFilter, searchQuery);
+      });
+    });
+
+    // Funciones de utilidad para mostrar/ocultar mensajes
+    function hideMessages() {
+      const messages = [postError, postSuccess];
+      messages.forEach(el => {
+        if (el) el.style.display = 'none';
+      });
+    }
+    
+    function showErrorMessage(el, msg) {
+      if (el) {
+        el.textContent = msg;
+        el.style.display = 'block';
+        el.style.backgroundColor = '#ffebee';
+        el.style.color = '#c62828';
+        el.style.padding = '10px';
+        el.style.borderRadius = '5px';
+        el.style.marginBottom = '15px';
+      }
+    }
+    
+    function showSuccessMessage(el, msg) {
+      if (el) {
+        el.textContent = msg;
+        el.style.display = 'block';
+        el.style.backgroundColor = '#e8f5e9';
+        el.style.color = '#2e7d32';
+        el.style.padding = '10px';
+        el.style.borderRadius = '5px';
+        el.style.marginBottom = '15px';
+      }
+    }
+
+    // ————— Inicialización —————
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicialmente ocultar los filtros
+      searchFilters.classList.remove('show');
+    });
+  </script>
+</body>
+</html>
