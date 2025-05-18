@@ -18,7 +18,7 @@ header {
   margin-bottom: 20px;
 }
 
-.container {
+.container-header {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -33,6 +33,7 @@ header {
 .logo {
   width: 140px;
   height: auto;
+  /* dbdbdb */
 }
 .container {
 max-width: 800px;

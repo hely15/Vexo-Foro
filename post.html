@@ -14,7 +14,7 @@
 
 <body>
   <header>
-    <div class="container">
+    <div class="container-header">
       <div class="header-content">
         <a href="index1.html">
           <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png" alt="VEXO logo">
@@ -104,7 +104,7 @@
         .onSnapshot(snapshot => {
           container.innerHTML = "";
           if (snapshot.empty) {
-            container.innerHTML = "<p>No hay comentarios aún.</p>";
+            container.innerHTML = "<p>No hay comentarios aún, Se el primero en comentar...</p>";
             return;
           }
 
@@ -127,10 +127,10 @@
                 currentUser && currentUser.uid === c.authorId ? `
                   <div class="comment-buttons">
                     <button class="btn-small edit-btn" onclick="editComment('${cid}', \`${c.text.replace(/`/g, '\\`')}\`)">
-                      <img src="pencil.svg" alt="Editar">
+                      <img src="storage/img/pencil.svg" alt="Editar">
                     </button>
                     <button class="btn-small delete-btn" onclick="deleteComment('${cid}')">
-                      <img src="trash.svg" alt="Eliminar">
+                      <img src="storage/img/trash.svg" alt="Eliminar">
                     </button>
                   </div>
                 ` : ''
