@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalles de la publicación</title>
   <link rel="stylesheet" href="css/post.css">
+
+  <!-- Firebase SDKs (sin duplicados y en el orden correcto) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -16,7 +17,7 @@
     <div class="container">
       <div class="header-content">
         <a href="index1.html">
-          <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png">
+          <img class="logo" src="storage/img/Diseño Proyecto Progresivo Pag 1-05.png" alt="VEXO logo">
         </a>
       </div>
     </div>
@@ -40,13 +41,9 @@
       <button onclick="addComment()">Comentar</button>
       <a href="index.html" class="back-link">Volver al foro</a>
     </div>
-
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
+  <!-- Script principal -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCL2CctB5ULQg2tkWKKTX20-Aot0aGsVYw",
@@ -56,6 +53,7 @@
       messagingSenderId: "373644979789",
       appId: "1:373644979789:web:5b08ef46eb8852c59fb604"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
@@ -81,17 +79,16 @@
         if (!doc.exists) return;
         const p = doc.data();
         document.getElementById("post").innerHTML = `
-        <div class="comment-header">
-          <img src="${p.authorPhotoURL || 'https://via.placeholder.com/40'}" alt="Foto autor">
-        <div>
-        <strong>${p.authorName}</strong><br>
-        <small>${p.createdAt?.toDate().toLocaleString() || ''}</small>
-        </div>
-        </div>
-        <div class="post-title">${p.title}</div>
-        <div class="post-content">${p.content}</div>
-`;
-
+          <div class="comment-header">
+            <img src="${p.authorPhotoURL || 'https://via.placeholder.com/40'}" alt="Foto autor">
+            <div>
+              <strong>${p.authorName}</strong><br>
+              <small>${p.createdAt?.toDate().toLocaleString() || ''}</small>
+            </div>
+          </div>
+          <div class="post-title">${p.title}</div>
+          <div class="post-content">${p.content}</div>
+        `;
       });
     }
 
@@ -118,7 +115,7 @@
             const div = document.createElement("div");
             div.className = "comment";
             div.innerHTML = `
-              <div class="comment-header" style="border-radius: 50%;">
+              <div class="comment-header">
                 <img src="${c.authorPhotoURL || 'https://via.placeholder.com/40'}" alt="Foto de perfil">
                 <div>
                   <strong>${c.authorName}</strong><br>
@@ -126,7 +123,8 @@
                 </div>
               </div>
               <div class="comment-body" id="text-${cid}">${c.text}</div>
-              ${currentUser && currentUser.uid === c.authorId ? `
+              ${
+                currentUser && currentUser.uid === c.authorId ? `
                   <div class="comment-buttons">
                     <button class="btn-small edit-btn" onclick="editComment('${cid}', \`${c.text.replace(/`/g, '\\`')}\`)">
                       <img src="pencil.svg" alt="Editar">
@@ -135,7 +133,6 @@
                       <img src="trash.svg" alt="Eliminar">
                     </button>
                   </div>
-
                 ` : ''
               }
             `;
@@ -176,5 +173,4 @@
     }
   </script>
 </body>
-
 </html>
