@@ -29,6 +29,7 @@ const inputInterests = document.getElementById("inputInterests")
 const btnSaveProfile = document.getElementById("btnSaveProfile")
 const btnEditInfo = document.getElementById("btnEditInfo")
 const btnCancelEdit = document.getElementById("btnCancelEdit")
+const editProfileModal = document.getElementById("editProfileModal")
 const editProfileForm = document.getElementById("editProfileForm")
 const profileLoader = document.getElementById("profileLoader")
 const profileError = document.getElementById("profileError")
@@ -153,13 +154,26 @@ function loadUserProfile(uid) {
     })
 }
 
-// Mostrar/ocultar formulario de edición
+// Mostrar/ocultar modal de edición
 btnEditInfo.addEventListener("click", () => {
-  editProfileForm.style.display = "block"
+  editProfileModal.style.display = "block"
+  // Asegurarse de que los datos estén actualizados
+  if (currentUser) {
+    loadUserProfile(currentUser.uid)
+  }
 })
 
 btnCancelEdit.addEventListener("click", () => {
-  editProfileForm.style.display = "none"
+  editProfileModal.style.display = "none"
+  hideMessages()
+})
+
+// Cerrar modal al hacer clic fuera del formulario
+window.addEventListener("click", (event) => {
+  if (event.target === editProfileModal) {
+    editProfileModal.style.display = "none"
+    hideMessages()
+  }
 })
 
 // Guardar cambios del perfil
@@ -199,8 +213,11 @@ btnSaveProfile.addEventListener("click", () => {
       if (profileBio) profileBio.textContent = profileData.bio || "Sin biografía"
       if (profileInterests) profileInterests.textContent = profileData.interests.join(", ") || "Sin intereses"
 
-      // Ocultar formulario después de guardar
-      editProfileForm.style.display = "none"
+      // Ocultar modal después de 2 segundos
+      setTimeout(() => {
+        editProfileModal.style.display = "none"
+        hideMessages()
+      }, 2000)
 
       console.log("Perfil actualizado correctamente")
     })
@@ -438,7 +455,6 @@ function showSuccessMessage(el, msg) {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM cargado, inicializando perfil")
 
-  // Ocultar formulario de edición al inicio
-  if (editProfileForm) editProfileForm.style.display = "none"
+  // Ocultar modal de edición al inicio
+  if (editProfileModal) editProfileModal.style.display = "none"
 })
-

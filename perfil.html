@@ -13,6 +13,9 @@
     <header class="contHeaderVexo">
         <nav class="logoVEXO">
             <img src="storage/img/LogoVEXO.png" alt="Logo Vexo">
+            <div class="nav-buttons">
+                <a href="index1.html" class="btn-nav">Volver al Foro</a>
+            </div>
         </nav>
     </header>
 
@@ -23,8 +26,8 @@
             <div class="profile-header">
                 <img id="userPic" class="fotoPerfil" src="storage/img/FotoDePerfilEjem.png" alt="Foto de perfil">
                 <div class="profile-info">
-                    <h1 id="userName" class="nombreUsu">Nocturna</h1>
-                    <button class="btn-seguir">Seguir</button>
+                    <h1 id="userName" class="nombreUsu">Nocturna </h1>
+                    <!-- <button class="btn-seguir">Seguir</button> -->
                 </div>
             </div>
             
@@ -74,18 +77,15 @@
                     <h2 class="titleInformacion">Información</h2>
                     <button id="btnEditInfo" class="btn-edit-info"><i class="fas fa-pencil-alt"></i></button>
                 </div>
-                <p id="profileBio">Perfil personal, creado para compartir mi manera de ver el mundo, dar mi opinión sobre diversos temas y compartir con mis seguidores un poco de lo que es mi vida.</p>                
-                <!-- <ul class="profile-details">
-                    <li><i class="fas fa-calendar"></i> Creada el 11 de mayo del 2025</li>
-                    <li><i class="fas fa-lock-open"></i> Cuenta pública</li>
-                </ul> -->
-                <!-- <div class="followers">
-                    <span class="count">100mil</span> Seguidores
-                </div> -->
+                <p id="profileBio">Perfil personal, creado para compartir mi manera de ver el mundo, dar mi opinión sobre diversos temas y compartir con mis seguidores un poco de lo que es mi vida.</p>
+                
+                <h3 class="titleIntereses">Intereses</h3>
+                <p id="profileInterests">Intereses</p>
             </aside>
         </article>
-        
-        <!-- Formulario de edición (inicialmente oculto) -->
+    </section>
+    <!-- Formulario de edición (modal) -->
+    <div id="editProfileModal" class="modal">
         <div id="editProfileForm" class="profile-form">
             <h3 class="welcome-title">Editar Perfil</h3>
             <div class="form-group">
@@ -96,6 +96,10 @@
               <label class="form-label" for="inputLocation">Ubicación</label>
               <input id="inputLocation" class="form-input">
             </div>
+            <div class="form-group">
+              <label class="form-label" for="inputInterests">Intereses</label>
+              <input id="inputInterests" class="form-input">
+            </div>
             <div class="form-actions">
                 <button id="btnSaveProfile" class="btn-save">Guardar Cambios</button>
                 <button id="btnCancelEdit" class="btn-cancel">Cancelar</button>
@@ -104,7 +108,7 @@
             <div id="profileError" class="error-message"></div>
             <div id="profileSuccess" class="success-message"></div>
         </div>
-    </section>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
