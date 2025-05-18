@@ -120,6 +120,8 @@
     flex-direction: column;
     width: 65%;
     padding: 1a0px;
+    top: 125%;
+    position: absolute;
   }
   
   /* Área de creación de post */
@@ -128,8 +130,6 @@
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
-    /* width: 50%; */
-    margin-left: 200px;
   }
   
   .create-post-title {
