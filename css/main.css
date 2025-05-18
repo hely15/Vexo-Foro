@@ -416,3 +416,44 @@ main {
     display: none;
   }
 }
+
+.contMenu {
+  position: absolute;
+  width: 17%;
+  height: 100%;
+  background-color: #dbdbdb;
+  top: 18.5%;
+  left: 3%;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 3vh;
+  font-size: 3vh;
+
+  a {
+    text-decoration: none;
+    color: black;
+    padding-left: 10%;
+  }
+}
+
+.menuTerminos {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 3vh;
+  font-size: 3vh;
+
+  a {
+    text-decoration: none;
+    color: black;
+    padding-left: 10%;
+  }
+}
