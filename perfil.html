@@ -1,36 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProfileVexo</title>
     <link rel="stylesheet" href="css/perfil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <header class="contHeaderVexo">
         <nav class="logoVEXO">
-            <img src="storage/img/LogoVEXO.png" alt="">
+            <img src="storage/img/LogoVEXO.png" alt="Logo Vexo">
         </nav>
     </header>
+
     <section class="contPerfil">
         <article class="contImgBanerPerfil">
-            <img class="imgBanner" src="storage/img/BannerVexoRe.svg" alt="">
-            <div>
-                <img id="userPic" class="fotoPerfil" src="storage/img/FotoDePerfilEjem.png" alt="">
-                <h1 id="userName" class="nombreUsu">Nocturna Satánica</h1>
-                <img class="buttonSeguir" src="storage/img/bottonSeguir.png" alt="">
+            <img class="imgBanner" src="storage/img/BannerVexoRe.svg" alt="Banner de perfil">
+            
+            <div class="profile-header">
+                <img id="userPic" class="fotoPerfil" src="storage/img/FotoDePerfilEjem.png" alt="Foto de perfil">
+                <div class="profile-info">
+                    <h1 id="userName" class="nombreUsu">Nocturna</h1>
+                    <button class="btn-seguir">Seguir</button>
+                </div>
             </div>
-            <article class="infoPerfil">
-                <h1 class="titleInformacion">Informacion</h1>
-                <p id="profileBio">Perfil personal, creado para compartir mi manera de ver el mundo dar mi opinion sobre
-                    diveros temas t compartir con mis seguidores un poco de lo que es mi vida</p>
-                <h3 class="titleIntereses">Intereses</h3>
-                <p id="profileInterests">Intereses</p>
-            </article>
+            
+            <div class="profile-content">
+                <div class="post-creation">
+                    <h3 class="create-post-title">Crear publicación</h3>
+                    <div class="form-group">
+                        <input id="postTitle" class="form-input" placeholder="Título">
+                    </div>
+                    <div class="form-group">
+                        <select id="postTopic" class="form-select" required>
+                            <option value="">Selecciona un tema</option>
+                            <option value="1">Infraestructura del Internet</option>
+                            <option value="2">Protocolos de Comunicación</option>
+                            <option value="3">Funcionamiento de la Web</option>
+                            <option value="4">APIs y Servicios Web</option>
+                            <option value="5">Seguridad y Buenas Prácticas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="postContent" class="form-textarea" placeholder="Escribe aquí tu contenido..."></textarea>
+                    </div>
+                    <div id="postError" class="error-message"></div>
+                    <div id="postSuccess" class="success-message"></div>
+                    <button id="btnCreatePost" class="btn-save">Publicar</button>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Mis publicaciones</h3>
+                    <div class="search-filters">
+                        <button class="filter-chip active" data-topic="all">Todos los temas</button>
+                        <button class="filter-chip" data-topic="1">Infraestructura del Internet</button>
+                        <button class="filter-chip" data-topic="2">Protocolos de Comunicación</button>
+                        <button class="filter-chip" data-topic="3">Funcionamiento de la Web</button>
+                        <button class="filter-chip" data-topic="4">APIs y Servicios Web</button>
+                        <button class="filter-chip" data-topic="5">Seguridad y Buenas Prácticas</button>
+                    </div>
+                </div>
+                
+                <div id="postsLoader" class="loader"></div>
+                <div id="postsList" class="post-list"></div>
+                <div id="noPostsMessage" class="no-posts-message">No has publicado nada todavía.</div>
+            </div>
+            
+            <aside class="infoPerfil">
+                <div class="info-header">
+                    <h2 class="titleInformacion">Información</h2>
+                    <button id="btnEditInfo" class="btn-edit-info"><i class="fas fa-pencil-alt"></i></button>
+                </div>
+                <p id="profileBio">Perfil personal, creado para compartir mi manera de ver el mundo, dar mi opinión sobre diversos temas y compartir con mis seguidores un poco de lo que es mi vida.</p>                
+                <!-- <ul class="profile-details">
+                    <li><i class="fas fa-calendar"></i> Creada el 11 de mayo del 2025</li>
+                    <li><i class="fas fa-lock-open"></i> Cuenta pública</li>
+                </ul> -->
+                <!-- <div class="followers">
+                    <span class="count">100mil</span> Seguidores
+                </div> -->
+            </aside>
         </article>
-        <div class="profile-form">
+        
+        <!-- Formulario de edición (inicialmente oculto) -->
+        <div id="editProfileForm" class="profile-form">
             <h3 class="welcome-title">Editar Perfil</h3>
             <div class="form-group">
               <label class="form-label" for="inputBio">Biografía</label>
@@ -40,31 +96,13 @@
               <label class="form-label" for="inputLocation">Ubicación</label>
               <input id="inputLocation" class="form-input">
             </div>
-            <div class="form-group">
-              <label class="form-label" for="inputInterests">Intereses</label>
-              <input id="inputInterests" class="form-input">
+            <div class="form-actions">
+                <button id="btnSaveProfile" class="btn-save">Guardar Cambios</button>
+                <button id="btnCancelEdit" class="btn-cancel">Cancelar</button>
             </div>
-            <button id="btnSaveProfile" class="btn-save">Guardar Cambios</button>
             <div id="profileLoader" class="loader"></div>
-            <div id="profileError" style="display: none;"></div>
-            <div id="profileSuccess" style="display: none;"></div>
-            <div id="postError" class="error-message">Hubo un error al publicar</div>
-        </div>
-        
-        <!-- Sección de Mis Publicaciones -->
-        <div class="my-posts-section">
-            <h2 class="section-title">Mis Publicaciones</h2>
-            <div class="search-filters">
-                <button class="filter-chip active" data-topic="all">Todos los temas</button>
-                <button class="filter-chip" data-topic="1">Infraestructura del Internet</button>
-                <button class="filter-chip" data-topic="2">Protocolos de Comunicación</button>
-                <button class="filter-chip" data-topic="3">Funcionamiento de la Web</button>
-                <button class="filter-chip" data-topic="4">APIs y Servicios Web</button>
-                <button class="filter-chip" data-topic="5">Seguridad y Buenas Prácticas</button>
-            </div>
-            <div id="postsLoader" class="loader"></div>
-            <div id="postsList" class="post-list"></div>
-            <div id="noPostsMessage" class="no-posts-message">No has publicado nada todavía.</div>
+            <div id="profileError" class="error-message"></div>
+            <div id="profileSuccess" class="success-message"></div>
         </div>
     </section>
 

@@ -13,7 +13,7 @@ const firebaseConfig = {
 }
 
 // Inicializar Firebase
-const firebase = window.firebase // Declare firebase
+const firebase = window.firebase
 firebase.initializeApp(firebaseConfig)
 const auth = firebase.auth()
 const db = firebase.firestore()
@@ -27,10 +27,18 @@ const inputBio = document.getElementById("inputBio")
 const inputLocation = document.getElementById("inputLocation")
 const inputInterests = document.getElementById("inputInterests")
 const btnSaveProfile = document.getElementById("btnSaveProfile")
+const btnEditInfo = document.getElementById("btnEditInfo")
+const btnCancelEdit = document.getElementById("btnCancelEdit")
+const editProfileForm = document.getElementById("editProfileForm")
 const profileLoader = document.getElementById("profileLoader")
 const profileError = document.getElementById("profileError")
 const profileSuccess = document.getElementById("profileSuccess")
+const postTitle = document.getElementById("postTitle")
+const postContent = document.getElementById("postContent")
+const postTopic = document.getElementById("postTopic")
+const btnCreatePost = document.getElementById("btnCreatePost")
 const postError = document.getElementById("postError")
+const postSuccess = document.getElementById("postSuccess")
 const postsList = document.getElementById("postsList")
 const postsLoader = document.getElementById("postsLoader")
 const noPostsMessage = document.getElementById("noPostsMessage")
@@ -145,6 +153,15 @@ function loadUserProfile(uid) {
     })
 }
 
+// Mostrar/ocultar formulario de edición
+btnEditInfo.addEventListener("click", () => {
+  editProfileForm.style.display = "block"
+})
+
+btnCancelEdit.addEventListener("click", () => {
+  editProfileForm.style.display = "none"
+})
+
 // Guardar cambios del perfil
 btnSaveProfile.addEventListener("click", () => {
   if (!currentUser) {
@@ -182,12 +199,81 @@ btnSaveProfile.addEventListener("click", () => {
       if (profileBio) profileBio.textContent = profileData.bio || "Sin biografía"
       if (profileInterests) profileInterests.textContent = profileData.interests.join(", ") || "Sin intereses"
 
+      // Ocultar formulario después de guardar
+      editProfileForm.style.display = "none"
+
       console.log("Perfil actualizado correctamente")
     })
     .catch((error) => {
       if (profileLoader) profileLoader.style.display = "none"
       console.error("Error al actualizar perfil:", error)
       showErrorMessage(profileError, "Error al guardar cambios")
+    })
+})
+
+// Crear nueva publicación
+btnCreatePost.addEventListener("click", () => {
+  if (!currentUser) {
+    showErrorMessage(postError, "Debes iniciar sesión")
+    return
+  }
+
+  const title = postTitle.value.trim()
+  const content = postContent.value.trim()
+  const topic = postTopic.value.trim()
+
+  if (!title) {
+    showErrorMessage(postError, "Título obligatorio")
+    return
+  }
+  if (!content) {
+    showErrorMessage(postError, "Contenido obligatorio")
+    return
+  }
+  if (!topic) {
+    showErrorMessage(postError, "Debes seleccionar un tema")
+    return
+  }
+
+  postsLoader.style.display = "block"
+  hideMessages()
+
+  db.collection("users")
+    .doc(currentUser.uid)
+    .get()
+    .then((doc) => {
+      // Si no existe, usamos los datos de currentUser
+      const u = doc.exists ? doc.data() : {}
+      const authorName = u.displayName || currentUser.displayName || "Usuario anónimo"
+      const authorPhotoURL = u.photoURL || currentUser.photoURL || ""
+
+      const newPost = {
+        title,
+        content,
+        topic,
+        topicName: topicMap[topic],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        authorId: currentUser.uid,
+        authorName,
+        authorPhotoURL,
+      }
+
+      return db.collection("posts").add(newPost)
+    })
+    .then(() => {
+      postsLoader.style.display = "none"
+      showSuccessMessage(postSuccess, "Publicado correctamente")
+      postTitle.value = ""
+      postContent.value = ""
+      postTopic.value = ""
+
+      // Recargar las publicaciones
+      loadUserPosts(currentFilter)
+    })
+    .catch((error) => {
+      postsLoader.style.display = "none"
+      console.error("Error al crear publicación:", error)
+      showErrorMessage(postError, "Error al publicar. Inténtalo de nuevo.")
     })
 })
 
@@ -223,26 +309,24 @@ function loadUserPosts(topicFilter) {
 
         // Crear elemento para la publicación
         const postElement = document.createElement("div")
-        postElement.className = "post-item"
+        postElement.className = "post"
 
         postElement.innerHTML = `
                     <div class="post-header">
-                        <img class="post-author-photo" src="${post.authorPhotoURL || userPic.src}" alt="">
-                        <span class="post-author-name">${post.authorName || userName.textContent}</span>
-                        <span class="post-date">${date}</span>
+                        <img class="post-profile-pic" src="${post.authorPhotoURL || userPic.src}" alt="">
+                        <div class="post-info">
+                            <h3>${post.authorName || userName.textContent}</h3>
+                            <p>${date} - ${post.topicName || ""}</p>
+                        </div>
                     </div>
-                    ${
-                      post.topicName
-                        ? `<span class="post-topic">${post.topicName}</span>`
-                        : post.topic && topicMap[post.topic]
-                          ? `<span class="post-topic">${topicMap[post.topic]}</span>`
-                          : ""
-                    }
-                    <h3 class="post-title">${post.title || ""}</h3>
-                    <p class="post-content">${post.content || ""}</p>
-                    <div class="post-actions">
-                        <a href="post.html?id=${postId}" class="btn-view">Ver detalles</a>
-                        <button class="btn-delete" data-id="${postId}">Eliminar</button>
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title || ""}</h3>
+                        <p class="post-text">${post.content || ""}</p>
+                        <div class="post-actions">
+                            <button class="btn-like"><i class="far fa-heart"></i></button>
+                            <a href="post.html?id=${postId}" class="btn-comment"><i class="far fa-comment"></i></a>
+                            <button class="btn-delete" data-id="${postId}"><i class="far fa-trash-alt"></i></button>
+                        </div>
                     </div>
                 `
 
@@ -320,7 +404,7 @@ filterChips.forEach((chip) => {
 
 // Funciones de utilidad para mostrar/ocultar mensajes
 function hideMessages() {
-  const messages = [profileError, profileSuccess, postError]
+  const messages = [profileError, profileSuccess, postError, postSuccess]
   messages.forEach((el) => {
     if (el) el.style.display = "none"
   })
@@ -350,32 +434,11 @@ function showSuccessMessage(el, msg) {
   }
 }
 
-// Para probar con un usuario ficticio cuando no hay autenticación (solo para desarrollo)
-function testWithMockUser() {
-  const urlParams = new URLSearchParams(window.location.search)
-  if (urlParams.get("test") === "true" && !currentUser) {
-    console.log("Modo de prueba activado")
-    const mockUser = {
-      uid: "test-user-123",
-      displayName: "Usuario de Prueba",
-      email: "test@example.com",
-      photoURL: "storage/img/FotoDePerfilEjem.png",
-    }
-
-    // Simular usuario autenticado
-    currentUser = mockUser
-    userName.textContent = mockUser.displayName
-    userPic.src = mockUser.photoURL
-
-    // Crear datos de prueba
-    checkUserInFirestore(mockUser)
-  }
-}
-
 // Inicialización cuando el DOM esté listo
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM cargado, inicializando perfil")
 
-  // Para desarrollo, puedes usar la función de prueba
-  // testWithMockUser();
+  // Ocultar formulario de edición al inicio
+  if (editProfileForm) editProfileForm.style.display = "none"
 })
+
