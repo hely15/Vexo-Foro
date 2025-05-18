@@ -77,6 +77,12 @@ El proyecto implementa una arquitectura cliente-servidor utilizando Firebase com
 ![image](https://github.com/user-attachments/assets/58d91788-ac3b-46ad-b16b-c64ddb119c45)
 
 
+### Recursos de Diseño 
+![image](https://github.com/user-attachments/assets/81b76e4b-c47e-4daf-8bd7-152008eb924b)
+![image](https://github.com/user-attachments/assets/11606229-ae58-48af-ac92-6dfec5f7b54a)
+![image](https://github.com/user-attachments/assets/41620588-8c7d-4aaf-b6f1-34d517bad647)
+
+
 ##
 
 Este proyecto está disponible como recurso educativo para la enseñanza de arquitectura de software, principios de diseño y patrones de software.
